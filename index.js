@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
-var port = process.env.PORT || 8080;
+//var port = process.env.PORT || 8080;
 
 var routes = require('./controllers/index');
 //var users = require('./controllers/users')
@@ -47,5 +47,8 @@ passport.use(new LocalStrategy({
 	});
 }));
 
-app.listen(port);
-console.log("App listening on port " + port);
+app.listen(process.env.PORT || 3000, function () {
+  var host = server.address().address
+  var port = server.address().port
+  console.log('App listening at http://%s:%s', host, port)
+});
