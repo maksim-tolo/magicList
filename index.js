@@ -1,19 +1,21 @@
 var express = require('express');
 var app = express();
+
 var mongoose = require('mongoose');
-var morgan = require('morgan');
+var morgan = require('morgan');     //logger
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
-//var port = process.env.PORT || 8080;
+var port = process.env.PORT || 3000;
 
 var routes = require('./controllers/index');
 //var users = require('./controllers/users')
+var database = require('./config/database');     //load the config
 
-//mongoose.connect('mongodb://localhost:27017/test');
+mongoose.connect(database.url);     // connect to mongoDB database
 
 app.use(express.static(__dirname + '/public'));
 
@@ -47,8 +49,5 @@ passport.use(new LocalStrategy({
 	});
 }));
 
-var server = app.listen(process.env.PORT || 3000, function () {
-  var host = server.address().address
-  var port = server.address().port
-  console.log('App listening at http://%s:%s', host, port)
-});
+app.listen(port);
+console.log("App listening on port " + port);
