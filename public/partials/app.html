@@ -1,0 +1,29 @@
+<div id="app">
+
+	<div id="sidebar">
+		<div>
+			user info
+		</div>
+		<ul>
+			<li ng-repeat="list in lists">
+				{{list.listName}}
+			</li>
+		</ul>
+	</div>
+
+	<main id="main">
+		<div>
+			<input type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
+		</div>
+		<ul>
+			<li ng-repeat="item in items" ng-click="displayTaskProperties=!displayTaskProperties">
+				{{list.item.itemName}}
+			</li>
+		</ul>
+	</main>
+
+	<div id="TaskProperties" ng-show="displayTaskProperties">
+		qwe
+	</div>
+
+</div>

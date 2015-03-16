@@ -1,24 +1,27 @@
-'use strict';
+var magicListApp = angular.module('magicListApp', [
+  'ui.router',
+  'magicListcontrollers'
+  ]);
 
-/* App Module */
+magicListApp.config(['$stateProvider', '$urlRouterProvider',
+ function($stateProvider, $urlRouterProvider) {
+  $urlRouterProvider.otherwise("/signin");
 
-var phonecatApp = angular.module('phonecatApp', [
-  'ngRoute',
-  'phonecatControllers'
-]);
+  $stateProvider
+  .state('notAuthenticated', {
+    url: "/signin",
+    templateUrl: "partials/signin.html",
+    controller: "signin"
+  })
+  .state('signup', {
+    url: "/signup",
+    templateUrl: "partials/signup.html",
+    controller: "signup"
+  })
+  .state('app', {
+    url: "/app",
+    templateUrl: "partials/app.html",
+    controller: "app"
+  });
 
-phonecatApp.config(['$routeProvider',
-  function($routeProvider) {
-    $routeProvider.
-      when('/phones', {
-        templateUrl: 'partials/phone-list.html',
-        controller: 'PhoneListCtrl'
-      }).
-      when('/phones/:phoneId', {
-        templateUrl: 'partials/phone-detail.html',
-        controller: 'PhoneDetailCtrl'
-      }).
-      otherwise({
-        redirectTo: '/phones'
-      });
-  }]);
+}]);

@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var listShema = new.mongoose.Shema({
 	owner: { type: Schema.Types.ObjectId, ref: 'User' },
 	listName: String,
-	members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+	members: [{ type: Number, ref: 'User' }],
 	item:
 	[{
 		itemName: String,
@@ -19,6 +19,4 @@ var listShema = new.mongoose.Shema({
 	}]
 });
 
-mongoose.model('List', userSchema);
-
-module.exports = userSchema;
+module.exports = mongoose.model('List', userSchema);
