@@ -4,11 +4,11 @@ var listShema = new.mongoose.Shema({
 	owner: { type: Schema.Types.ObjectId, ref: 'User' },
 	listName: String,
 	members: [{ type: Number, ref: 'User' }],
-	item:
+	items:
 	[{
-		itemName: String,
+		taskName: String,
 		complited: Boolean,
-		attechments: [],
+		attachments: [],
 		description: String,
 		deadline: Date,
 		subtasks:

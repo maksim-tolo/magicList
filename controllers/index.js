@@ -8,43 +8,13 @@ var isAuthenticated = function (req, res, next) {
 	if (req.isAuthenticated())
 		return next();
 	// if the user is not authenticated then redirect him to the login page
-	res.redirect('/');
+	res.redirect('/users/login');
 }
 
 module.exports = function(passport){
 
-	/* GET login page. */
-	router.get('*', function(req, res) {
-    	// Display the Login page with any flash message, if any
+	router.get('/', function(req, res) {
 		res.sendFile('./public/index.html');
-	});
-
-	/* Handle Login POST */
-	router.post('/login', passport.authenticate('login', {
-		successRedirect: '/home',
-		failureRedirect: '/',
-		failureFlash : true  
-	}));
-
-	/* GET Registration Page */
-	router.get('/signup', function(req, res){
-		res.sendFile('./public/index.html');
-	});
-
-	/* Handle Registration POST */
-	router.post('/api/signup', function(req, res){
-		res.send('gcncnngvnvgng');
-	});
-
-	/* GET Home Page */
-	router.get('/home', isAuthenticated, function(req, res){
-		res.sendFile('./public/home.html');
-	});
-
-	/* Handle Logout */
-	router.get('/signout', function(req, res) {
-		req.logout();
-		res.redirect('/');
 	});
 
 	return router;

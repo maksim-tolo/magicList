@@ -1,5 +1,5 @@
 var express = require('express');
-var users = express.Router();
+var router = express.Router();
 
 var isAuthenticated = function (req, res, next) {
 	// if user is authenticated in the session, call the next() to call the next request handler 
@@ -8,7 +8,7 @@ var isAuthenticated = function (req, res, next) {
 	if (req.isAuthenticated())
 		return next();
 	// if the user is not authenticated then redirect him to the login page
-	res.redirect('/');
+	res.redirect('/users/login');
 }
 
 module.exports = function(passport){

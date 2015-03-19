@@ -3,14 +3,59 @@
 <head>
 	<meta charset="utf-8">
 	<title> magicList </title>
-	<link rel="stylesheet" type="text/css" href="css/signin.css">
+	<link rel="stylesheet" type="text/css" href="css/app.css">
 	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
 	<script src="bower_components/angular/angular.js"></script>
 	<script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+	<script src="bower_components/ui-bootstrap/src/modal/modal.js"></script>
+	<script src="bower_components/ui-bootstrap/src/transition/transition.js"></script>
 	<script src="js/app.js"></script>
 	<script src="js/controllers.js"></script>
 </head>
-<body>
-	<div ui-view></div>
+<body ng-controller="app">
+	<script type="text/ng-template" id="myModalContent.html">
+	<div class="modal-header">
+		<h3 class="modal-title">Создать новый список</h3>
+	</div>
+	<div class="modal-body">
+		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" autofocus></input>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="save()" ng-disabled="!newListName">Сохранить</button>
+		<button class="btn btn-danger" ng-click="cancel()">Отмена</button>
+	</div>
+</script>
+
+<div id="app">
+
+	<div id="sidebar">
+		<div>
+			user info
+		</div>
+		<ul class="lists">
+			<li ng-repeat="list in lists" ng-click="activeList($event, list)" ng-init="$parent.addActiveClassOnLoad()">
+				{{list.listName}}
+			</li>
+		</ul>
+
+		<button class="btn btn-default add-list" ng-click="open()">+</button>
+	</div>
+
+	<main id="main">
+		<div>
+			<input type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
+		</div>
+		<ul class="tasks">
+			<li ng-repeat="task in lists[currentListNumber].tasks" ng-dblclick="$parent.displayTaskProperties=!$parent.displayTaskProperties">
+				{{task.taskName}}
+			</li>
+		</ul>
+	</main>
+
+	<div id="TaskProperties" ng-show="displayTaskProperties">
+		qwe
+	</div>
+
+</div>
 </body>
 </html>
