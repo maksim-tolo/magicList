@@ -1,9 +1,85 @@
 var magicListcontrollers = angular.module('magicListcontrollers', []);
 
-magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParams',
-	function($scope, $modal, $log, $stateParams) {
+magicListcontrollers.controller('home', ['$scope', 'AppRoute', '$state',
+	function($scope, AppRoute, $state) {
 
-		$scope.lists = [];
+		AppRoute.get()
+			.success(function(data) {
+                if(data=="logged") $state.go('app');
+            });
+		
+	}]);
+
+magicListcontrollers.controller('signin', ['$scope', 'AppRoute', '$rootScope', '$state',
+	function($scope, AppRoute, $rootScope, $state) {
+		$scope.user = {
+			email: "",
+			password: ""
+		}
+
+		$scope.emailIsEmpty=false;
+		$scope.passwordIsEmpty=false;
+
+		$scope.submitForm = function() {
+			AppRoute.signin($scope.user)
+			.success(function(data) {
+                if(data) {
+                	$rootScope.user=data;
+                	$state.go('app');
+                }
+            });
+		};
+
+	}]);
+
+magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$rootScope',
+	function($scope, $state, AppRoute, $rootScope) {
+
+		$scope.user={
+			firstName: '',
+			lastName: '',
+			email: '',
+			password: ''
+		};
+
+		$scope.passwordAgain='';
+
+		$scope.firstNameIsEmpty=false;
+		$scope.lastNameIsEmpty=false;
+		$scope.emailIsEmpty=false;
+		$scope.emailIsValid=false;
+		$scope.passwordIsEmpty=false;
+		$scope.passwordIsShort=false;
+		$scope.passwordsIsComply=false;
+		$scope.emailIsAlreadyExist=false;
+
+		$scope.checkEmail = function() {
+			//проверка на занятость имейла
+		}
+
+		$scope.comparePassword = function() {
+			return $scope.user.password == $scope.passwordAgain ? false : true;
+		};
+
+		$scope.submitForm = function() {
+			AppRoute.signup($scope.user)
+			.success(function(data) {
+                if(data) {
+                	$rootScope.user=data;
+                	$state.go('app');
+                }
+            })
+            .error(function(data) {
+                alert(data)
+            });
+		};
+
+	}]);
+
+magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParams', 'AppRoute', '$rootScope',
+	function($scope, $modal, $log, $stateParams, AppRoute, $rootScope) {
+
+		$scope.lists = $rootScope.user.lists;
 		$scope.displayTaskProperties = false;
 		$scope.newTaskName = "";
 		$scope.currentListNumber = 0;

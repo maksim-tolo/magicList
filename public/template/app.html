@@ -1,0 +1,44 @@
+<script type="text/ng-template" id="myModalContent.html">
+	<div class="modal-header">
+		<h3 class="modal-title">Создать новый список</h3>
+	</div>
+	<div class="modal-body">
+		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" autofocus></input>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="save()" ng-disabled="!newListName">Сохранить</button>
+		<button class="btn btn-danger" ng-click="cancel()">Отмена</button>
+	</div>
+</script>
+
+<div id="app">
+
+	<div id="sidebar">
+		<div>
+			user info
+		</div>
+		<ul class="lists">
+			<li ng-repeat="list in lists" ng-click="activeList($event, list)" ng-init="$parent.addActiveClassOnLoad()">
+				{{list.listName}}
+			</li>
+		</ul>
+
+		<button class="btn btn-default add-list" ng-click="open()">+</button>
+	</div>
+
+	<main id="main">
+		<div>
+			<input type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
+		</div>
+		<ul class="tasks">
+			<li ng-repeat="task in lists[currentListNumber].tasks" ng-dblclick="$parent.displayTaskProperties=!$parent.displayTaskProperties">
+				{{task.taskName}}
+			</li>
+		</ul>
+	</main>
+
+	<div id="TaskProperties" ng-show="displayTaskProperties">
+		qwe
+	</div>
+	
+</div>
