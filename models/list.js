@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
 
-var listShema = new.mongoose.Shema({
-	owner: { type: Schema.Types.ObjectId, ref: 'User' },
+var listShema = new mongoose.Schema({
+	owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 	listName: String,
-	members: [{ type: Number, ref: 'User' }],
-	items:
+	members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+	tasks:
 	[{
 		taskName: String,
 		complited: Boolean,
@@ -19,4 +19,4 @@ var listShema = new.mongoose.Shema({
 	}]
 });
 
-module.exports = mongoose.model('List', userSchema);
+module.exports = mongoose.model('List', listShema);

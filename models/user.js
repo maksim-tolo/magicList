@@ -6,7 +6,7 @@ var userSchema = new mongoose.Schema({
 	lastName: String,
 	email: String,
 	password: String,
-	lists: [{ type: Number, ref: 'List' }]
+	lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'List' }]
 });
 
 // methods ======================

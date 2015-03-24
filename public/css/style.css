@@ -42,6 +42,10 @@
 .lists {
 	padding: 0; 
 	list-style: none;
+	-webkit-user-select: none;
+  	-moz-user-select: none;
+ 	-ms-user-select: none;
+  	-o-user-select: none;
 }
 .lists li {
 	text-align: center;
@@ -55,6 +59,10 @@
 .tasks {
 	padding: 0; 
 	list-style: none;
+	-webkit-user-select: none;
+  	-moz-user-select: none;
+ 	-ms-user-select: none;
+  	-o-user-select: none;
 }
 .tasks li {
 	cursor: pointer;

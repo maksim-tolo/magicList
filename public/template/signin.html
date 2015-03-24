@@ -5,23 +5,24 @@
 
 			<form name="authForm" ng-submit="submitForm()" novalidate>
 
-				<div class="form-group" ng-class="{ 'has-error' : emailIsEmpty }">
+				<div class="form-group" ng-class="{ 'has-error' : emailIsEmpty || userIsNotExist}">
 					<label>Email</label>
 					<input type="email" name="email" ng-model="user.email" required autocomplete="on" class="form-control" ng-blur="emailIsEmpty=authForm.email.$error.required" ng-change="emailIsEmpty=authForm.email.$error.required">
 					<p ng-show="emailIsEmpty" class="help-block">Email is required.</p>
 				</div>
 
-				<div class="form-group" ng-class="{ 'has-error' : passwordIsEmpty }">
+				<div class="form-group" ng-class="{ 'has-error' : passwordIsEmpty || userIsNotExist}">
 					<label>Password</label>
 					<input type="password" name="password" ng-model="user.password" required class="form-control" ng-blur="passwordIsEmpty=authForm.password.$error.required" ng-change="passwordIsEmpty=authForm.password.$error.required">
 					<p ng-show="passwordIsEmpty" class="help-block">Password is required.</p>
+					<p ng-show="userIsNotExist" class="help-block">Invalid username or password.</p>
 				</div>
 
 				<button type="submit" class="btn btn-primary btn-lg" ng-disabled="authForm.$invalid">Signin</button>
 
 			</form>
 
-			<a href="signup.html">Signup</a>
+			<a ui-sref="signup">Signup</a>
 
 		</div>
 	</div>

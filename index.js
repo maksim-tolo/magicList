@@ -26,11 +26,10 @@ app.use(express.static(__dirname + '/public'));
 
 app.use(morgan('dev'));
 
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Middlewares, которые должны быть определены до passport:
-app.use(cookieParser());
 //app.use(bodyParser());
 app.use(session({ secret: 'SecretMagiclist' })); // session secret
 app.use(passport.initialize());

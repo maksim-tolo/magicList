@@ -1,6 +1,19 @@
-<script type="text/ng-template" id="myModalContent.html">
+<script type="text/ng-template" id="addList.html">
 	<div class="modal-header">
 		<h3 class="modal-title">Создать новый список</h3>
+	</div>
+	<div class="modal-body">
+		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" autofocus></input>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="save()" ng-disabled="!newListName">Сохранить</button>
+		<button class="btn btn-danger" ng-click="cancel()">Отмена</button>
+	</div>
+</script>
+
+<script type="text/ng-template" id="listConfiguration.html">
+	<div class="modal-header">
+		<h3 class="modal-title">Настройки списка</h3>
 	</div>
 	<div class="modal-body">
 		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" autofocus></input>
@@ -18,27 +31,29 @@
 			user info
 		</div>
 		<ul class="lists">
-			<li ng-repeat="list in lists" ng-click="activeList($event, list)" ng-init="$parent.addActiveClassOnLoad()">
+			<li ng-repeat="list in lists" ng-click="$parent.changeActiveList($index)" ng-dblclick="$parent.listConfiguration($index)" ng-class="{ 'active' : $parent.addActiveClass($index)}">
 				{{list.listName}}
 			</li>
 		</ul>
 
-		<button class="btn btn-default add-list" ng-click="open()">+</button>
+		<button class="btn btn-default add-list" ng-click="addList()">+</button>
 	</div>
 
-	<main id="main">
+	<main id="main" ng-click="currentTaskNumber=null">
 		<div>
 			<input type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
 		</div>
 		<ul class="tasks">
-			<li ng-repeat="task in lists[currentListNumber].tasks" ng-dblclick="$parent.displayTaskProperties=!$parent.displayTaskProperties">
+			<li ng-repeat="task in lists[currentListNumber].tasks" ng-dblclick="$parent.currentTaskNumber=$index">
 				{{task.taskName}}
 			</li>
 		</ul>
 	</main>
 
-	<div id="TaskProperties" ng-show="displayTaskProperties">
-		qwe
-	</div>
-	
+	<ul id="TaskProperties" ng-show="currentTaskNumber!==null">
+		<li ng-repeat="task in lists[currentListNumber].tasks" ng-show="$parent.showTaskConfiguration($index)">
+			{{task.taskName}}
+		</li>
+	</ul>
+
 </div>
