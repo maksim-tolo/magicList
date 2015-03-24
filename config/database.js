@@ -1,1 +1,1 @@
-module.exports = { url: 'mongodb://localhost:27017/test' };
+module.exports = { url: 'mongodb://magiclist-2820:YLqst0DG2EZUPzpxw7OK@magiclist-2820.mongo.dbs.appsdeck.eu:30248/magiclist-2820' };
