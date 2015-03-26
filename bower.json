@@ -1,0 +1,25 @@
+{
+  "name": "magicList",
+  "version": "1.0.0",
+  "homepage": "https://github.com/maksim-tolo/magicList",
+  "authors": [
+    "Maksim Talochka <maksim.tolo@gmail.com>"
+  ],
+  "description": "A simple todo app for sharing todo list with your friends",
+  "main": "server.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "todo-app"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

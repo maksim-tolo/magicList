@@ -3,7 +3,7 @@
 		<h3 class="modal-title">Создать новый список</h3>
 	</div>
 	<div class="modal-body">
-		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" autofocus></input>
+		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" ng-keyup="$event.keyCode == 13 && newListName && save()" autofocus></input>
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-primary" ng-click="save()" ng-disabled="!newListName">Сохранить</button>
@@ -11,9 +11,9 @@
 	</div>
 </script>
 
-<script type="text/ng-template" id="listConfiguration.html">
+<script type="text/ng-template" id="renameList.html">
 	<div class="modal-header">
-		<h3 class="modal-title">Настройки списка</h3>
+		<h3 class="modal-title">Переименовать</h3>
 	</div>
 	<div class="modal-body">
 		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" autofocus></input>
@@ -24,15 +24,25 @@
 	</div>
 </script>
 
+<script type="text/ng-template" id="removeList.html">
+	<div class="modal-body">
+		<h4 class="modal-title">{{listName}} будет удалён навсегда</h4>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-danger" ng-click="save()">Удалить список</button>
+		<button class="btn btn-primary" ng-click="cancel()">Отмена</button>
+	</div>
+</script>
+
 <div id="app">
 
 	<div id="sidebar">
-		<div>
-			user info
-		</div>
+		<div class="userInfo">{{user.firstName}}</div>
 		<ul class="lists">
-			<li ng-repeat="list in lists" ng-click="$parent.changeActiveList($index)" ng-dblclick="$parent.listConfiguration($index)" ng-class="{ 'active' : $parent.addActiveClass($index)}">
-				{{list.listName}}
+			<li class="clearfix" ng-repeat="list in lists" ng-click="$parent.changeActiveList($index)" context-menu="$parent.menuOptions($index)" ng-class="{ 'active' : $parent.addActiveClass($index)}">
+				<span class="glyphicon glyphicon-file"></span>
+				<span>{{list.listName}}</span>
+				<span ng-show="list.tasks.length" class="numberOfTasks">{{list.tasks.length}}</span>
 			</li>
 		</ul>
 
@@ -40,14 +50,22 @@
 	</div>
 
 	<main id="main" ng-click="currentTaskNumber=null">
+	<div>
 		<div>
-			<input type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
+			<input class="addTask" type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
 		</div>
 		<ul class="tasks">
-			<li ng-repeat="task in lists[currentListNumber].tasks" ng-dblclick="$parent.currentTaskNumber=$index">
+			<li class="clearfix" ng-repeat="task in lists[currentListNumber].tasks" ng-dblclick="$parent.currentTaskNumber=$index" ng-show="!task.complited">
+				<input type="checkbox" ng-click="$parent.changeTaskStatus($index)">
+				<div>{{task.taskName}}</div>
+			</li>
+		</ul>
+		<ul class="tasks">
+			<li ng-repeat="task in lists[currentListNumber].tasks" ng-dblclick="$parent.currentTaskNumber=$index" ng-show="task.complited">
 				{{task.taskName}}
 			</li>
 		</ul>
+		</div>
 	</main>
 
 	<ul id="TaskProperties" ng-show="currentTaskNumber!==null">

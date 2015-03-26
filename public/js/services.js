@@ -6,15 +6,15 @@ AppService.factory('AppRoute', ['$http',
 		return {
 
 			signup : function(userData) {
-				return $http.post('/api/signup', userData);
+				return $http.post('/signup', userData);
 			},
 
 			signin : function(userData) {
-				return $http.post('/api/signin', userData);
+				return $http.post('/signin', userData);
 			},
 
 			checkEmail : function(email) {
-				return $http.post('/api/checkEmail', email);
+				return $http.get('/api/checkEmail', email);
 			},
 
 			createList : function(data) {
@@ -27,6 +27,14 @@ AppService.factory('AppRoute', ['$http',
 
 			changeListName : function(data) {
 				return $http.post('/api/changeListName', data);
+			},
+
+			removeList : function(data) {
+				return $http.post('/api/removeList', data);
+			},
+
+			changeTaskStatus : function(data) {
+				return $http.post('/api/changeTaskStatus', data);
 			}
 
 		}       

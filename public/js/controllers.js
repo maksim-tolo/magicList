@@ -49,7 +49,7 @@ magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$ses
 			if ($scope.user.email) {
 			AppRoute.checkEmail( { email: $scope.user.email } )
 			.success(function(data) {
-                if(data=="exist") {
+                if(data) {
                 	$scope.emailIsAlreadyExist=true;
                 }
             });
@@ -135,11 +135,11 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 		};
 
-		$scope.listConfiguration = function (index) {
+		$scope.renameList = function (index) {
 
 			var modalInstance = $modal.open({
-      		templateUrl: 'listConfiguration.html',
-      		controller: 'listConfigurationCtrl',
+      		templateUrl: 'renameList.html',
+      		controller: 'renameListCtrl',
       		resolve: {
         		index: function () {
           			return index;
@@ -150,10 +150,38 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 			modalInstance.result.then(function (newListName) {
 
 				AppRoute.changeListName({ listName: newListName, listId: $rootScope.user.lists[index]._id })
+					.success(function() {
+                		$rootScope.user.lists[index].listName = newListName;           	
+            	});
+
+			}, function () {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+
+		};
+
+		$scope.removeList = function (size, index) {
+
+			var modalInstance = $modal.open({
+      		templateUrl: 'removeList.html',
+      		controller: 'removeListCtrl',
+      		size: size,
+      		resolve: {
+        		index: function () {
+          			return index;
+        		}
+      		}
+    		});
+
+			modalInstance.result.then(function () {
+
+				AppRoute.removeList({ listId: $rootScope.user.lists[index]._id })
 					.success(function(resData) {
-                		if (resData="success") {
-                			$rootScope.user.lists[index].listName = newListName;
-                		};             	
+                		if ($scope.currentListNumber==$rootScope.user.lists.length-1) {
+                			if ($rootScope.user.lists.length==1) $scope.currentListNumber=0;
+                			else $scope.currentListNumber--;
+                		};
+                		$rootScope.user.lists.splice(index, 1);           	
             	});
 
 			}, function () {
@@ -164,8 +192,40 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 		$scope.showTaskConfiguration = function (index) {
 			return index===$scope.currentTaskNumber ? true : false;
-		}
+		};
 
+		$scope.menuOptions = function (index) {
+
+			var action = $scope.leaveList;
+			var actionName = 'Покинуть';
+			if($rootScope.user.lists[index].owner==$rootScope.user._id) {
+				actionName = 'Удалить';
+				action = $scope.removeList;
+			};
+
+			return [
+				[$rootScope.user.lists[index].listName, function () {
+        		$scope.changeActiveList(index);
+    			}],
+    			null,
+    			['Переименовать', function () {
+        			$scope.renameList(index);
+    			}],
+    			['Добавить участников', function () {
+        		
+   				}],
+    			[actionName, function () {
+        			action('sm', index);
+   				}]
+			];
+		};
+
+		$scope.changeTaskStatus = function (index) {
+			AppRoute.changeTaskStatus({ listId: $rootScope.user.lists[$scope.currentListNumber]._id, taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[index]._id })
+					.success(function() {
+         				$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited=!$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited;
+            	});
+		}
 	}]);
 
 magicListcontrollers.controller('addListCtrl', ['$scope', '$modalInstance',
@@ -181,13 +241,27 @@ magicListcontrollers.controller('addListCtrl', ['$scope', '$modalInstance',
 	};
 }]);
 
-magicListcontrollers.controller('listConfigurationCtrl', ['$scope', '$rootScope', '$modalInstance', 'index',
+magicListcontrollers.controller('renameListCtrl', ['$scope', '$rootScope', '$modalInstance', 'index',
 	function ($scope, $rootScope, $modalInstance, index) {
 
 	$scope.newListName=$rootScope.user.lists[index].listName;
 
 	$scope.save = function () {
 		$modalInstance.close($scope.newListName);
+	};
+
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+}]);
+
+magicListcontrollers.controller('removeListCtrl', ['$scope', '$rootScope', '$modalInstance', 'index',
+	function ($scope, $rootScope, $modalInstance, index) {
+
+	$scope.listName='"'+$rootScope.user.lists[index].listName+'"';
+
+	$scope.save = function () {
+		$modalInstance.close();
 	};
 
 	$scope.cancel = function () {

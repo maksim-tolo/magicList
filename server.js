@@ -9,6 +9,11 @@ var session = require('express-session');
 var flash = require('connect-flash');
 
 var passport = require('passport');
+
+var apiRoutes = require('./routes/apiRoutes');
+var mainRoutes = require('./routes/mainRoutes');
+
+
 //var LocalStrategy = require('passport-local').Strategy;
 
 var port = process.env.PORT || 3000;
@@ -42,8 +47,9 @@ app.use(flash());
 // Initialize Passport
 //var initPassport = require('./controllers/passport/init');
 //initPassport(passport);
-
-require('./controllers/routes.js')(app, passport);
+app.use('/', mainRoutes);
+app.use('/api', apiRoutes);
+//require('./controllers/routes.js')(app, passport);
 
 app.listen(port);
 console.log("App listening on port " + port);

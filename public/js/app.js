@@ -4,7 +4,8 @@ var magicListApp = angular.module('magicListApp', [
   'magicListcontrollers',
   'ui.bootstrap.transition',
   'AppService',
-  'ngStorage'
+  'ngStorage',
+  'ui.bootstrap.contextMenu'
   ]);
 
 magicListApp.config(['$stateProvider', '$urlRouterProvider',
