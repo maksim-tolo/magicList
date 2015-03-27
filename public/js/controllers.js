@@ -1,6 +1,6 @@
 var magicListcontrollers = angular.module('magicListcontrollers', []);
 
-magicListcontrollers.controller('signin', ['$scope', 'AppRoute', '$state', '$localStorage', '$rootScope',
+magicListcontrollers.controller('login', ['$scope', 'AppRoute', '$state', '$localStorage', '$rootScope',
 	function($scope, AppRoute, $state, $localStorage, $rootScope) {
 		$scope.user = {
 			email: "",
@@ -12,9 +12,8 @@ magicListcontrollers.controller('signin', ['$scope', 'AppRoute', '$state', '$loc
 		$scope.userIsNotExist=false;
 
 		$scope.submitForm = function() {
-			AppRoute.signin($scope.user)
+			AppRoute.login($scope.user)
 			.success(function(data) {
-				alert(data.loginMessage);
                 $localStorage.user=data;
                 $rootScope.user=$localStorage.user;
                 if($rootScope.user.lists.length) $state.go('app', { listId: $rootScope.user.lists[0]._id });
@@ -71,9 +70,6 @@ magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$loc
                 	$rootScope.user=$localStorage.user;
                 	$state.go('app');
                 }
-            })
-            .error(function(data) {
-                alert(data)
             });
 		};
 
@@ -110,8 +106,6 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
                 		$rootScope.user.lists[$scope.currentListNumber].tasks.push(resData);             	
             	});
 
-				//$scope.lists[$scope.currentListNumber].tasks.push(task);
-				//здесь обновить данные сервера
 				$scope.newTaskName="";
 			}
 		};
@@ -272,7 +266,7 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 		$scope.endSession = function () {
 			$localStorage.user=null;
-			$state.go('signin');
+			$state.go('login');
 		}
 
 }]);

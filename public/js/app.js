@@ -10,13 +10,13 @@ var magicListApp = angular.module('magicListApp', [
 
 magicListApp.config(['$stateProvider', '$urlRouterProvider',
  function($stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise("/signin");
+  $urlRouterProvider.otherwise("/login");
 
   $stateProvider
-  .state('signin', {
-    url: "/signin",
-    templateUrl: "template/signin.html",
-    controller: "signin"
+  .state('login', {
+    url: "/login",
+    templateUrl: "template/login.html",
+    controller: "login"
   })
   .state('signup', {
     url: "/signup",

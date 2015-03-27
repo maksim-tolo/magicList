@@ -14,7 +14,7 @@ router.post('/signup', passport.authenticate('local-signup'), function(req, res)
     res.send(req.user);
 });
 
-router.post('/signin', passport.authenticate('local-login'), function(req, res) {
+router.post('/login', passport.authenticate('local-login'), function(req, res) {
     res.send(req.user);
 });
 

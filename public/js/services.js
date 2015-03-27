@@ -9,8 +9,8 @@ AppService.factory('AppRoute', ['$http',
 				return $http.post('/signup', userData);
 			},
 
-			signin : function(userData) {
-				return $http.post('/signin', userData);
+			login : function(userData) {
+				return $http.post('/login', userData);
 			},
 
 			checkEmail : function(email) {
@@ -50,7 +50,7 @@ AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope',
 
 		this.checkAccess = function(event, toState, toParams, fromState, fromParams) {
 
-			if ((toState.name=='signin' || toState.name=='signup') && $localStorage.user) {
+			if ((toState.name=='login' || toState.name=='signup') && $localStorage.user) {
 				AppRoute.getUser({ userId: $localStorage.user._id })
 					.success(function(resData) {
 						$localStorage.user = resData;
@@ -61,7 +61,7 @@ AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope',
                 	})
                 	.error(function() {
                 		event.preventDefault();
-                		$state.go('signin');
+                		$state.go('login');
                 	});
 			} else if ($localStorage.user) {
 				$rootScope.user = $localStorage.user;
