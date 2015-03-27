@@ -1,1 +1,1 @@
-module.exports = { url: 'mongodb://magiclist-3007:RTKfd7RPCnDS6--LKH-V@magiclist-3007.mongo.dbs.appsdeck.eu:30273/magiclist-3007' };
+module.exports = { url: 'mongodb://magiclist-6071:ODWzlBQENNsGeL8cVtGJ@magiclist-6071.mongo.dbs.appsdeck.eu:30275/magiclist-6071' };
