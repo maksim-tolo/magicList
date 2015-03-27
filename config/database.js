@@ -1,1 +1,1 @@
-module.exports = { url: 'MONGO_URL' };
+module.exports = { url: 'SCALINGO_MONGO_URL' };
