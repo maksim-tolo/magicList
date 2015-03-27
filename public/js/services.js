@@ -14,7 +14,7 @@ AppService.factory('AppRoute', ['$http',
 			},
 
 			checkEmail : function(email) {
-				return $http.get('/api/checkEmail', email);
+				return $http.post('/api/checkEmail', email);
 			},
 
 			createList : function(data) {
@@ -35,36 +35,37 @@ AppService.factory('AppRoute', ['$http',
 
 			changeTaskStatus : function(data) {
 				return $http.post('/api/changeTaskStatus', data);
+			},
+
+			getUser : function (data) {
+				return $http.post('/api/getUser', data);
 			}
 
 		}       
 
 	}]);
 
-AppService.service('SessionService', ['$injector',
-	function($injector) {
+AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope', '$state',
+	function($localStorage, AppRoute, $rootScope, $state) {
 
 		this.checkAccess = function(event, toState, toParams, fromState, fromParams) {
-			var $scope = $injector.get('$rootScope'),
-			$sessionStorage = $injector.get('$sessionStorage');
 
-			if (toState.data !== undefined) {
-				if (toState.data.noLogin !== undefined && toState.data.noLogin) {
-            	// если нужно, выполняйте здесь какие-то действия 
-            	// перед входом без авторизации
-            	if ($scope.$root.user) {
-            		event.preventDefault(); //доделать!!!
-            		$scope.$state.go('app');
-            	};
-            }
-        } else {
-          		// вход с авторизацией
-          		if ($sessionStorage.user) {
-          			$scope.$root.user = $sessionStorage.user;
-          		} else {
-           			event.preventDefault();
-           			$scope.$state.go('signin');
-           		}
-           	}
+			if ((toState.name=='signin' || toState.name=='signup') && $localStorage.user) {
+				AppRoute.getUser({ userId: $localStorage.user._id })
+					.success(function(resData) {
+						$localStorage.user = resData;
+						$rootScope.user = $localStorage.user;
+                		event.preventDefault();
+                		if($rootScope.user.lists.length) $state.go('app', { listId: $rootScope.user.lists[0]._id });
+                		else $state.go('app');
+                	})
+                	.error(function() {
+                		event.preventDefault();
+                		$state.go('signin');
+                	});
+			} else if ($localStorage.user) {
+				$rootScope.user = $localStorage.user;
+			}
         };
+
     }]);

@@ -4,6 +4,7 @@ var listShema = new mongoose.Schema({
 	owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 	listName: String,
 	members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+	membersEmail: [],
 	tasks:
 	[{
 		taskName: String,

@@ -2,10 +2,10 @@ var magicListApp = angular.module('magicListApp', [
   'ui.router',
   'ui.bootstrap.modal',
   'magicListcontrollers',
-  'ui.bootstrap.transition',
   'AppService',
   'ngStorage',
-  'ui.bootstrap.contextMenu'
+  'ui.bootstrap.contextMenu',
+  'ui.bootstrap.dropdown'
   ]);
 
 magicListApp.config(['$stateProvider', '$urlRouterProvider',
@@ -16,18 +16,12 @@ magicListApp.config(['$stateProvider', '$urlRouterProvider',
   .state('signin', {
     url: "/signin",
     templateUrl: "template/signin.html",
-    controller: "signin",
-    data: {
-      'noLogin': true
-    }
+    controller: "signin"
   })
   .state('signup', {
     url: "/signup",
     templateUrl: "template/signup.html",
-    controller: "signup",
-    data: {
-      'noLogin': true
-    }
+    controller: "signup"
   })
   .state('app', {
     url: "/app/:listId",
@@ -39,12 +33,6 @@ magicListApp.config(['$stateProvider', '$urlRouterProvider',
 
 magicListApp.run(['$rootScope', '$state', '$stateParams', 'SessionService',
   function ($rootScope, $state, $stateParams, SessionService) {
-
-    $rootScope.$state = $state;
-    $rootScope.$stateParams = $stateParams;
-
-    $rootScope.user = null;
-
     $rootScope.$on('$stateChangeStart',
       function (event, toState, toParams, fromState, fromParams) {
         SessionService.checkAccess(event, toState, toParams, fromState, fromParams);

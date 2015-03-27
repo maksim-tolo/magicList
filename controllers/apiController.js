@@ -2,6 +2,15 @@ var User = require('../models/user');
 var List = require('../models/list');
 var apiController = {};
 
+apiController.getUser = function (req, res) {
+    User.findById(req.body.userId)
+    .populate('lists')
+    .exec(function(err, user) {
+        if (err) return console.error(err);
+        res.send(user);
+    });
+};
+
 apiController.checkEmail = function (req, res) {
 	User.findOne({ 'email': req.body.email }, function(err, user) {
 		if (err) return console.error(err);
@@ -15,6 +24,7 @@ apiController.createList = function (req, res) {
 	newList.listName = req.body.listName;
 	newList.owner = req.body.ownerId;
 	newList.members.push(req.body.ownerId);
+    newList.membersEmail.push(req.body.ownerEmail);
 	newList.save(function(err){
 		if (err) return console.error(err);
 	});
@@ -58,14 +68,15 @@ apiController.changeTaskStatus = function (req, res) {
 
     List.findOne({ 'tasks._id': req.body.taskId }, function(err, list) {
         if (err) return console.error(err);
-        console.log(list);
+        for (var i = 0; i < list.tasks.length; i++) {
+            if(list.tasks[i]._id==req.body.taskId) previousValue=list.tasks[i].complited;
+        };
     });
 
     List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.complited': !previousValue }}, function(err) {
         if (err) return console.error(err);
     });
     res.end();
-        //.update({ 'tasks[req.body.taskIndex].complited': !previousValue });
 };
 
 module.exports = apiController;

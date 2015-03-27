@@ -1,7 +1,7 @@
 var magicListcontrollers = angular.module('magicListcontrollers', []);
 
-magicListcontrollers.controller('signin', ['$scope', 'AppRoute', '$state', '$sessionStorage',
-	function($scope, AppRoute, $state, $sessionStorage) {
+magicListcontrollers.controller('signin', ['$scope', 'AppRoute', '$state', '$localStorage', '$rootScope',
+	function($scope, AppRoute, $state, $localStorage, $rootScope) {
 		$scope.user = {
 			email: "",
 			password: ""
@@ -14,8 +14,11 @@ magicListcontrollers.controller('signin', ['$scope', 'AppRoute', '$state', '$ses
 		$scope.submitForm = function() {
 			AppRoute.signin($scope.user)
 			.success(function(data) {
-                $sessionStorage.user=data;
-                $state.go('app');
+				alert(data.loginMessage);
+                $localStorage.user=data;
+                $rootScope.user=$localStorage.user;
+                if($rootScope.user.lists.length) $state.go('app', { listId: $rootScope.user.lists[0]._id });
+                else $state.go('app');
             })
             .error(function() {
                 $scope.userIsNotExist=true;
@@ -24,8 +27,8 @@ magicListcontrollers.controller('signin', ['$scope', 'AppRoute', '$state', '$ses
 
 	}]);
 
-magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$sessionStorage',
-	function($scope, $state, AppRoute, $sessionStorage) {
+magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$localStorage', '$rootScope',
+	function($scope, $state, AppRoute, $localStorage, $rootScope) {
 
 		$scope.user={
 			firstName: '',
@@ -64,7 +67,8 @@ magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$ses
 			AppRoute.signup($scope.user)
 			.success(function(data) {
                 if(data) {
-                	$sessionStorage.user=data;
+                	$localStorage.user=data;
+                	$rootScope.user=$localStorage.user;
                 	$state.go('app');
                 }
             })
@@ -75,12 +79,13 @@ magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$ses
 
 	}]);
 
-magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParams', 'AppRoute', '$rootScope', '$state',
-	function($scope, $modal, $log, $stateParams, AppRoute, $rootScope, $state) {
+magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParams', 'AppRoute', '$rootScope', '$state', '$localStorage',
+	function($scope, $modal, $log, $stateParams, AppRoute, $rootScope, $state, $localStorage) {
 
 		$scope.lists = $rootScope.user.lists;
 		$scope.currentTaskNumber = null;
 		$scope.newTaskName = "";
+		$scope.showComplitedTasks = false;
 
 		if ($stateParams.listId) {
 			$scope.currentListNumber = (function(){
@@ -124,9 +129,10 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 			modalInstance.result.then(function (newListName) {
 
-				AppRoute.createList({ listName: newListName, ownerId: $rootScope.user._id })
+				AppRoute.createList({ listName: newListName, ownerId: $rootScope.user._id, ownerEmail: $rootScope.user.email })
 					.success(function(resData) {
-                		$rootScope.user.lists.push(resData);             	
+                		$rootScope.user.lists.push(resData);
+                		if($rootScope.user.lists.length===1) $state.go('app', { listId: $scope.lists[0]._id });
             	});
 
 			}, function () {
@@ -196,11 +202,16 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 		$scope.menuOptions = function (index) {
 
-			var action = $scope.leaveList;
-			var actionName = 'Покинуть';
+			var action = $scope.addListMembers;
+			var actionName = 'Добавить участников';
+			var action2 = $scope.leaveList;
+			var action2Name = 'Покинуть';
+
 			if($rootScope.user.lists[index].owner==$rootScope.user._id) {
-				actionName = 'Удалить';
-				action = $scope.removeList;
+				//actionName = 'Изменить участников';
+				action2Name = 'Удалить';
+				//action = $scope.changeListMembers;
+				action2 = $scope.removeList;			
 			};
 
 			return [
@@ -211,22 +222,60 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
     			['Переименовать', function () {
         			$scope.renameList(index);
     			}],
-    			['Добавить участников', function () {
-        		
-   				}],
     			[actionName, function () {
-        			action('sm', index);
+        			action(index);
+   				}],
+    			[action2Name, function () {
+        			action2('sm', index);
    				}]
 			];
 		};
 
 		$scope.changeTaskStatus = function (index) {
-			AppRoute.changeTaskStatus({ listId: $rootScope.user.lists[$scope.currentListNumber]._id, taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[index]._id })
-					.success(function() {
-         				$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited=!$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited;
+			AppRoute.changeTaskStatus({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[index]._id })
+				.success(function() {
+         			$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited=!$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited;
+            });
+		};
+
+		$scope.calcNumberOfActiveTasks = function (list) {
+			if($scope.lists.length) {
+				return list.tasks.filter(function(el) {
+					if (!el.complited) return el;
+				}).length;
+			}
+		};
+
+		$scope.addListMembers = function (index) {
+			var modalInstance = $modal.open({
+				templateUrl: 'addListMembers.html',
+				controller: 'addListMembersCtrl',
+				resolve: {
+        		index: function () {
+          			return index;
+        		}
+      		}
+			});
+
+			modalInstance.result.then(function (newListMembers) {
+
+				AppRoute.addListMembersRequest({ listMembers: newListMembers })
+					.success(function(resData) {
+                		$rootScope.user.lists.push(resData);
+                		if($rootScope.user.lists.length===1) $state.go('app', { listId: $scope.lists[0]._id });
             	});
+
+			}, function () {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
 		}
-	}]);
+
+		$scope.endSession = function () {
+			$localStorage.user=null;
+			$state.go('signin');
+		}
+
+}]);
 
 magicListcontrollers.controller('addListCtrl', ['$scope', '$modalInstance',
 	function ($scope, $modalInstance) {
@@ -262,6 +311,20 @@ magicListcontrollers.controller('removeListCtrl', ['$scope', '$rootScope', '$mod
 
 	$scope.save = function () {
 		$modalInstance.close();
+	};
+
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+}]);
+
+magicListcontrollers.controller('addListMembersCtrl', ['$scope', '$modalInstance', '$rootScope', 'index',
+	function ($scope, $modalInstance, $rootScope, index) {
+
+	$scope.listMembers = $rootScope.user.lists[index].membersEmail;
+
+	$scope.save = function () {
+		$modalInstance.close($scope.newListName);
 	};
 
 	$scope.cancel = function () {
