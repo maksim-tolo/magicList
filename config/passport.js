@@ -25,7 +25,7 @@ module.exports = function(passport) {
         process.nextTick(function() {
             User
             .findOne({ 'email' :  email })
-            .populate('lists')
+            .populate('lists inbox')
             .exec(function(err, user) {
                 // if there are any errors, return the error
                 if (err)

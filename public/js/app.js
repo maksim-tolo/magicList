@@ -1,3 +1,5 @@
+var io = io.connect();
+
 var magicListApp = angular.module('magicListApp', [
   'ui.router',
   'ui.bootstrap.modal',
@@ -5,7 +7,8 @@ var magicListApp = angular.module('magicListApp', [
   'AppService',
   'ngStorage',
   'ui.bootstrap.contextMenu',
-  'ui.bootstrap.dropdown'
+  'ui.bootstrap.dropdown',
+  'magicListDirectives'
   ]);
 
 magicListApp.config(['$stateProvider', '$urlRouterProvider',

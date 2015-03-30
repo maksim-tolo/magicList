@@ -2,9 +2,16 @@
 <html ng-app="magicListApp">
 <head>
 	<meta charset="utf-8">
-	<title> magicList </title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title> MagicList </title>
+
 	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+	<script src="/socket.io/socket.io.js"></script>
+
 	<script src="bower_components/angular/angular.js"></script>
 	<script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
 	<script src="bower_components/ui-bootstrap/src/modal/modal.js"></script>
@@ -12,9 +19,11 @@
 	<script src="bower_components/ui-bootstrap/src/transition/transition.js"></script>
 	<script src="bower_components/ngstorage/ngStorage.js"></script>
 	<script src="bower_components/angular-bootstrap-contextmenu/contextMenu.js"></script>
+	
 	<script src="js/app.js"></script>
 	<script src="js/controllers.js"></script>
 	<script src="js/services.js"></script>
+	<script src="js/directives.js"></script>
 </head>
 <body>
 	 <div ui-view></div>

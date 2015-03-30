@@ -37,8 +37,28 @@ AppService.factory('AppRoute', ['$http',
 				return $http.post('/api/changeTaskStatus', data);
 			},
 
+			addListMember : function(data) {
+				return $http.put('/api/addListMember', data);
+			},
+
 			getUser : function (data) {
 				return $http.post('/api/getUser', data);
+			},
+
+			confirmInboxList : function (data) {
+				return $http.post('/api/confirmInboxList', data);
+			},
+
+			rejectInboxList : function (data) {
+				return $http.post('/api/rejectInboxList', data);
+			},
+
+			leaveList : function (data) {
+				return $http.post('/api/leaveList', data);
+			},
+
+			removeUserFromList : function (data) {
+				return $http.post('/api/removeUserFromList', data);
 			}
 
 		}       

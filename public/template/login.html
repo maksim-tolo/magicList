@@ -1,29 +1,91 @@
-<div class="container">
-	<div class="row">  
+<nav class="navbar navbar-inverse navbar-fixed-top" resizable>
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" ng-class="{ 'collapsed' : !showNavbar }" ng-click="showNavbar=!showNavbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" ui-sref="login">MagicList</a>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse" ng-class="{ 'in' : showNavbar }">
 
-		<div class="col-md-6 col-md-offset-3">
-
-			<form name="authForm" ng-submit="submitForm()" novalidate>
-
+			<form class="navbar-form navbar-right" name="authForm" ng-submit="submitForm()" novalidate>
 				<div class="form-group" ng-class="{ 'has-error' : emailIsEmpty || userIsNotExist}">
-					<label>Email</label>
-					<input type="email" name="email" ng-model="user.email" required autocomplete="on" class="form-control" ng-blur="emailIsEmpty=authForm.email.$error.required" ng-change="emailIsEmpty=authForm.email.$error.required">
-					<p ng-show="emailIsEmpty" class="help-block">Email is required.</p>
+					<input placeholder="Email" type="email" name="email" ng-model="user.email" required autocomplete="on" class="form-control" ng-blur="emailIsEmpty=authForm.email.$error.required" ng-change="emailIsEmpty=authForm.email.$error.required; userIsNotExist=false">
+					<div class="popoverLogin" ng-show="emailIsEmpty && !showNavbar">
+						<div class="popover bottom">
+							<div class="arrow"></div>
+							<div class="popover-inner">
+								<div class="popover-content help-block">Введите Email</div>
+							</div>
+						</div>
+					</div>
+					<p ng-show="emailIsEmpty && showNavbar" class="help-block">Введите Email</p>
 				</div>
 
 				<div class="form-group" ng-class="{ 'has-error' : passwordIsEmpty || userIsNotExist}">
-					<label>Password</label>
-					<input type="password" name="password" ng-model="user.password" required class="form-control" ng-blur="passwordIsEmpty=authForm.password.$error.required" ng-change="passwordIsEmpty=authForm.password.$error.required">
-					<p ng-show="passwordIsEmpty" class="help-block">Password is required.</p>
-					<p ng-show="userIsNotExist" class="help-block">Invalid username or password.</p>
+					<input popover="On the Bottom!" popover-placement="bottom" popover-trigger="focus"placeholder="Пароль" type="password" name="password" ng-model="user.password" required class="form-control" ng-blur="passwordIsEmpty=authForm.password.$error.required" ng-change="passwordIsEmpty=authForm.password.$error.required; userIsNotExist=false">
+					<div class="popoverLogin" ng-show="passwordIsEmpty && !showNavbar">
+						<div class="popover bottom">
+							<div class="arrow"></div>
+							<div class="popover-inner">
+								<div class="popover-content help-block">Введите пароль</div>
+							</div>
+						</div>
+					</div>
+					<p ng-show="passwordIsEmpty && showNavbar" class="help-block">Введите пароль.</p>
+					<div class="popoverLogin" ng-show="userIsNotExist && !showNavbar">
+						<div class="popover bottom">
+							<div class="arrow"></div>
+							<div class="popover-inner">
+								<div class="popover-content help-block">Неверный Email или пароль</div>
+							</div>
+						</div>
+					</div>
+					<p ng-show="userIsNotExist && showNavbar" class="help-block">Неверный Email или пароль.</p>
 				</div>
 
-				<button type="submit" class="btn btn-primary btn-lg" ng-disabled="authForm.$invalid">Signin</button>
-
+				<button type="submit" class="btn btn-success" ng-disabled="authForm.$invalid">Войти</button>
 			</form>
 
-			<a ui-sref="signup">Signup</a>
+		</div><!--/.navbar-collapse -->
+	</div>
+</nav>
 
-		</div>
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+	<div class="container">
+		<h1>Hello, world!</h1>
+		<p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+		<p><a class="btn btn-primary btn-lg" ui-sref="signup" role="button">Зарегистрироваться &raquo;</a></p>
 	</div>
 </div>
+
+<div class="container">
+	<!-- Example row of columns -->
+	<div class="row">
+		<div class="col-md-4">
+			<h2>Heading</h2>
+			<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+			<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+		</div>
+		<div class="col-md-4">
+			<h2>Heading</h2>
+			<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+			<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+		</div>
+		<div class="col-md-4">
+			<h2>Heading</h2>
+			<p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+			<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+		</div>
+	</div>
+
+	<hr>
+
+	<footer>
+		<p>&copy; Maxim Tolochko 2015</p>
+	</footer>
+</div> <!-- /container -->

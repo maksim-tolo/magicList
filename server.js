@@ -1,5 +1,6 @@
-var express = require('express');
+var express = require('express.io');
 var app = express();
+app.http().io();
 
 var mongoose = require('mongoose');
 var morgan = require('morgan');     //logger
@@ -30,6 +31,20 @@ app.use(passport.session());
 
 app.use('/', mainRoutes);
 app.use('/api', apiRoutes);
+
+app.io.route('listRooms', function(req) {
+	for (var i = 0; i < req.data.length; i++) req.io.join(req.data[i]);
+});
+
+app.io.route('userRooms', function(req) {
+	req.io.join(req.data);
+});
+
+app.io.route('update', function(req) {
+    req.io.room(req.data).broadcast('updateUser', {
+    	message: 'update'
+    });
+});
 
 app.listen(port);
 console.log("App listening on port " + port);

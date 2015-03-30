@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'icomoon';
-	src:url('../fonts/icomoon.eot?k2k6xu');
-	src:url('../fonts/icomoon.eot?#iefixk2k6xu') format('embedded-opentype'),
-		url('../fonts/icomoon.woff?k2k6xu') format('woff'),
-		url('../fonts/icomoon.ttf?k2k6xu') format('truetype'),
-		url('../fonts/icomoon.svg?k2k6xu#icomoon') format('svg');
+	src:url('../fonts/icomoon.eot?-merz6g');
+	src:url('../fonts/icomoon.eot?#iefix-merz6g') format('embedded-opentype'),
+		url('../fonts/icomoon.woff?-merz6g') format('woff'),
+		url('../fonts/icomoon.ttf?-merz6g') format('truetype'),
+		url('../fonts/icomoon.svg?-merz6g#icomoon') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -34,6 +34,14 @@
 	cursor: pointer;
 	margin-left: 5px;
 	font-size: 20px;
+}
+
+.icon-file:before {
+	content: "\e603";
+}
+
+.icon-copy:before {
+	content: "\e604";
 }
 
 body {
@@ -80,7 +88,7 @@ body {
 	color: #a3a3a2;
 	font-size: 12px;
 }
-.addTask, .newListName {
+.newListName {
 	margin: 10px;
 	padding: 8px 20px;
 	border-radius: 4px;
@@ -88,6 +96,18 @@ body {
 	width: 100%;
 	font-size: 16px;
 	margin: 10px 0;
+}
+.addTask {
+	margin: 10px;
+	padding: 8px 20px;
+	border-radius: 4px;
+	border: none;
+	width: 100%;
+	font-size: 16px;
+	margin: 10px 0;
+	background: rgba(0,0,0,0.3);
+	outline: none;
+	color: #fff;
 }
 .add-list {
 	position: absolute;
@@ -114,14 +134,8 @@ body {
 	cursor: pointer;
 	background: white;
 }
-.lists .glyphicon {
-	color: #a3a3a2;
-}
 .active {
 	background: #009ae4 !important;
-	color: #fff !important;
-}
-.active .glyphicon {
 	color: #fff !important;
 }
 .tasks {
@@ -142,7 +156,7 @@ body {
 	border-radius: 4px;
 	border: 1px solid #ECF0F1;
 	background: #FFFFFF;
-	margin: 5px 0;
+	margin: 4px 0;
 	padding: 5px;
 	font-size: 16px;
 }
@@ -164,9 +178,87 @@ body {
 	padding-left: 20px;
 	cursor: pointer;
 }
+.userInfo {
+	padding: 2px 0; 
+	border-bottom: 1px solid #ECF0F1;
+}
 .userInfo li:hover {
 	background: #F0F0F0;
 }
 .userInfo .divider {
 	padding: 0;
+}
+.userInfo button {
+	border: none;
+	background: #fff;
+	outline: none;
+	font-weight: 600;
+	font-size: 16px;
+}
+.dropdown-menu {
+	width: 220px;
+	overflow: hidden;
+}
+.inbox {
+	padding: 5px;
+	margin: 0;
+	list-style: none;
+}
+.inbox div {
+	float: left;
+}
+.inboxButtons {
+	float: right;
+}
+.inbox .glyphicon {
+	height: 14px;
+}
+.inbox li {
+	margin: 2px 0;
+}
+.membersListFooter {
+	margin-top: 0 !important;
+}
+.membersListTitle {
+	margin-bottom: 10px !important;
+}
+.membersList {
+	list-style: none;
+	font-size: 18px;
+}
+.membersList .clearfix > * {
+	float: left;
+}
+.membersList .glyphicon-remove-circle {
+	float: right;
+	cursor: pointer;
+	font-size: 22px;
+}
+.membersList .glyphicon-user {
+	margin-right: 8px;
+}
+.membersList li {
+	padding: 4px 0;
+}
+.popover {
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+.popoverLogin {
+	position: relative;
+}
+.popover-content {
+	margin: 0;
+}
+.signupTitle {
+	text-align: center;
+}
+.registration {
+	margin-bottom: 0;
+	position: absolute;
+	bottom: 0;
+	top: 0;
+	left: 0;
+	right: 0;
 }

@@ -1,45 +1,55 @@
-<div class="container">
-	<div class="row">  
+<nav class="navbar navbar-inverse navbar-fixed-top" resizable>
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" ui-sref="login">MagicList</a>
+		</div>
+	</div>
+</nav>
+<div class="jumbotron registration">
+<h3 class="signupTitle">Регистрация нового пользователя</h3>
+	<div class="container">
+		<div class="row">  
 
-		<div class="col-md-6 col-md-offset-3">
-			<form name="authForm" ng-submit="submitForm()" novalidate>
+			<div class="col-md-6 col-md-offset-3">
+				<form name="authForm" ng-submit="submitForm()" novalidate>
 
-				<div class="form-group" ng-class="{ 'has-error' : firstNameIsEmpty }">
-					<label>First Name</label>
-					<input type="text" ng-model="user.firstName" name="firstName" required class="form-control" ng-blur="firstNameIsEmpty=authForm.firstName.$error.required" ng-change="firstNameIsEmpty=authForm.firstName.$error.required">
-					<p ng-show="firstNameIsEmpty" class="help-block">First Name is required.</p>
-				</div>
+					<div class="form-group" ng-class="{ 'has-error' : firstNameIsEmpty }">
+						<label>Имя</label>
+						<input type="text" ng-model="user.firstName" name="firstName" required class="form-control" ng-blur="firstNameIsEmpty=authForm.firstName.$error.required" ng-change="firstNameIsEmpty=authForm.firstName.$error.required">
+						<span ng-show="firstNameIsEmpty" class="help-block">Имя обязательно для заполнения.</span>
+					</div>
 
-				<div class="form-group" ng-class="{ 'has-error' : lastNameIsEmpty }">
-					<label>Last Name</label>
-				<input type="text" ng-model="user.lastName" name="lastName" required class="form-control" ng-blur="lastNameIsEmpty=authForm.lastName.$error.required" ng-change="lastNameIsEmpty=authForm.lastName.$error.required">
-				<p ng-show="lastNameIsEmpty" class="help-block">Last Name is required.</p>
-				</div>
+					<div class="form-group" ng-class="{ 'has-error' : lastNameIsEmpty }">
+						<label>Фамилия</label>
+						<input type="text" ng-model="user.lastName" name="lastName" required class="form-control" ng-blur="lastNameIsEmpty=authForm.lastName.$error.required" ng-change="lastNameIsEmpty=authForm.lastName.$error.required">
+						<span ng-show="lastNameIsEmpty" class="help-block">Фамилия обязательна для заполнения.</span>
+					</div>
 
-				<div class="form-group" ng-class="{ 'has-error' : emailIsValid || emailIsAlreadyExist }">
-					<label>Email</label>
-				<input type="email" ng-model="user.email" name="email" required class="form-control" ng-blur="emailIsEmpty=authForm.email.$error.required; emailIsValid=authForm.email.$invalid; emailIsAlreadyExist=checkEmail()" ng-change="emailIsEmpty=authForm.email.$error.required; emailIsValid=authForm.email.$invalid">
-				<p ng-show="emailIsEmpty" class="help-block">Email is required.</p>
-				<p ng-show="emailIsValid && !emailIsEmpty" class="help-block">Enter a valid email.</p>
-				<p ng-show="emailIsAlreadyExist" class="help-block">User with this email is already exists.</p>
-				</div>
+					<div class="form-group" ng-class="{ 'has-error' : emailIsValid || emailIsAlreadyExist }">
+						<label>Email</label>
+						<input type="email" ng-model="user.email" name="email" required class="form-control" ng-blur="emailIsEmpty=authForm.email.$error.required; emailIsValid=authForm.email.$invalid; emailIsAlreadyExist=checkEmail()" ng-change="emailIsEmpty=authForm.email.$error.required; emailIsValid=authForm.email.$invalid">
+						<span ng-show="emailIsEmpty" class="help-block">Email обязателен для заполнения.</span>
+						<span ng-show="emailIsValid && !emailIsEmpty" class="help-block">Введите корректный email.</span>
+						<span ng-show="emailIsAlreadyExist" class="help-block">Пользователь с таким email уже зарегистрирован.</span>
+					</div>
 
-				<div class="form-group" ng-class="{ 'has-error' : passwordIsEmpty || passwordIsShort || passwordsIsComply }">
-					<label>Password</label>
-				<input type="password" ng-model="user.password" name="password1" ng-minlength="6" required class="form-control" ng-blur="passwordIsEmpty=authForm.password1.$error.required; passwordIsShort=authForm.password1.$error.minlength" ng-change="passwordsIsComply=comparePassword(); passwordIsEmpty=authForm.password1.$error.required; passwordIsShort=authForm.password1.$error.minlength">
-				<p ng-show="passwordIsEmpty" class="help-block">Password is required.</p>
-				<p ng-show="passwordIsShort" class="help-block">Password is too short.</p>
-				</div>
+					<div class="form-group" ng-class="{ 'has-error' : passwordIsEmpty || passwordIsShort || passwordsIsComply }">
+						<label>Пароль</label>
+						<input type="password" ng-model="user.password" name="password1" ng-minlength="6" required class="form-control" ng-blur="passwordIsEmpty=authForm.password1.$error.required; passwordIsShort=authForm.password1.$error.minlength" ng-change="passwordsIsComply=comparePassword(); passwordIsEmpty=authForm.password1.$error.required; passwordIsShort=authForm.password1.$error.minlength">
+						<span ng-show="passwordIsEmpty" class="help-block">Пароль обязателен для заполнения.</span>
+						<span ng-show="passwordIsShort" class="help-block">Пароль слишком короткий.</span>
+					</div>
 
-				<div class="form-group" ng-class="{ 'has-error' : passwordsIsComply && !passwordIsShort }">
-					<label>Password again</label>
-				<input type="password" ng-model="passwordAgain" name="password2" ng-minlength="6" required class="form-control" ng-change="passwordsIsComply=comparePassword()">
-				<p ng-show="passwordsIsComply && !passwordIsShort" class="help-block">Passwords is not comply.</p>
-				</div>
+					<div class="form-group" ng-class="{ 'has-error' : passwordsIsComply && !passwordIsShort }">
+						<label>Повторите пароль</label>
+						<input type="password" ng-model="passwordAgain" name="password2" ng-minlength="6" required class="form-control" ng-change="passwordsIsComply=comparePassword()">
+						<span ng-show="passwordsIsComply && !passwordIsShort" class="help-block">Пароли не совпадают.</span>
+					</div>
 
-				<button type="submit" class="btn btn-primary" ng-disabled="authForm.$invalid || passwordsIsComply || emailIsAlreadyExist">Submit</button>
+					<button type="submit" class="btn btn-primary" ng-disabled="authForm.$invalid || passwordsIsComply || emailIsAlreadyExist">Зарегистрироваться</button>
 
-			</form>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>

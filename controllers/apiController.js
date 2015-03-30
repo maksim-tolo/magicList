@@ -4,7 +4,7 @@ var apiController = {};
 
 apiController.getUser = function (req, res) {
     User.findById(req.body.userId)
-    .populate('lists')
+    .populate('lists inbox')
     .exec(function(err, user) {
         if (err) return console.error(err);
         res.send(user);
@@ -42,7 +42,7 @@ apiController.createTask = function (req, res) {
 };
 
 apiController.changeListName = function (req, res) {
-	List.findByIdAndUpdate(req.body.listId, { listName: req.body.listName }, function(err, list){
+	List.findByIdAndUpdate(req.body.listId, { listName: req.body.listName }, function(err){
         if (err) return console.error(err);
         res.end();
     });
@@ -50,14 +50,14 @@ apiController.changeListName = function (req, res) {
 
 apiController.removeList = function (req, res) {
 	List.findById(req.body.listId, function(err, list) {
-        for (var i = 0; i < list.members.length; i++) {
-            User.findByIdAndUpdate(list.members[i], { $pull: { 'lists': req.body.listId } }, function(err, list){
+        for (var i = 0; i < list.membersEmail.length; i++) {
+            User.update({ 'email': list.membersEmail[i] }, { $pull: { 'lists': req.body.listId, 'inbox': req.body.listId } }, function(err){
                 if (err) return console.error(err);
             });
         }
     });
 
-    List.findByIdAndRemove(req.body.listId, function(err, list){
+    List.findByIdAndRemove(req.body.listId, function(err){
         if (err) return console.error(err);
         res.end();
     });
@@ -69,14 +69,74 @@ apiController.changeTaskStatus = function (req, res) {
     List.findOne({ 'tasks._id': req.body.taskId }, function(err, list) {
         if (err) return console.error(err);
         for (var i = 0; i < list.tasks.length; i++) {
-            if(list.tasks[i]._id==req.body.taskId) previousValue=list.tasks[i].complited;
+            if(list.tasks[i]._id==req.body.taskId) {
+                previousValue=list.tasks[i].complited;
+                List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.complited': !previousValue }}, function(err) {
+                    if (err) return console.error(err);
+                });
+                res.end();
+            }
         };
     });
+};
 
-    List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.complited': !previousValue }}, function(err) {
+apiController.addListMember = function (req, res) {
+    List.findByIdAndUpdate(req.body.listId, { $push: {'membersEmail': req.body.userEmail } }, function(err){
         if (err) return console.error(err);
     });
-    res.end();
+    User.update({ 'email': req.body.userEmail }, { $push: {'inbox': req.body.listId } }, function(err){
+        if (err) return console.error(err);
+        res.end();
+    });
+};
+
+apiController.confirmInboxList = function (req, res) {
+    User.update({ 'email': req.body.userEmail }, { $pull: {'inbox': req.body.listId }, $push: {'lists': req.body.listId } }, function(err){
+        if (err) return console.error(err);       
+    });
+    User.findOne({ 'email': req.body.userEmail }, function(err, user) {
+        if (err) return console.error(err);
+        List.findByIdAndUpdate(req.body.listId, { $push: {'members': user._id } }, function(err){
+            if (err) return console.error(err);
+        });
+        res.end();
+    });
+};
+
+apiController.rejectInboxList = function (req, res) {
+    List.findByIdAndUpdate(req.body.listId, { $pull: {'membersEmail': req.body.userEmail } }, function(err){
+        if (err) return console.error(err);
+    });
+    User.update({ 'email': req.body.userEmail }, { $pull: {'inbox': req.body.listId } }, function(err){
+        if (err) return console.error(err);
+        res.end();
+    });
+};
+
+apiController.leaveList = function (req, res) {
+    User.update({ 'email': req.body.userEmail }, { $pull: {'lists': req.body.listId } }, function(err){
+        if (err) return console.error(err);      
+    });
+    User.findOne({ 'email': req.body.userEmail }, function(err, user) {
+        if (err) return console.error(err);
+        List.findByIdAndUpdate(req.body.listId, { $pull: {'membersEmail': req.body.userEmail, 'members': user._id } }, function(err){
+            if (err) return console.error(err);
+        });
+        res.end();
+    });
+};
+
+apiController.removeUserFromList = function (req, res) {
+    User.update({ 'email': req.body.userEmail }, { $pull: {'lists': req.body.listId, 'inbox': req.body.listId } }, function(err){
+        if (err) return console.error(err);      
+    });
+    User.findOne({ 'email': req.body.userEmail }, function(err, user) {
+        if (err) return console.error(err);
+        List.findByIdAndUpdate(req.body.listId, { $pull: {'membersEmail': req.body.userEmail, 'members': user._id } }, function(err){
+            if (err) return console.error(err);
+        });
+        res.send(user._id);
+    });    
 };
 
 module.exports = apiController;

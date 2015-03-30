@@ -7,7 +7,7 @@ var userSchema = new mongoose.Schema({
 	email: String,
 	password: String,
 	lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'List' }],
-	inbox: []
+	inbox: [{ type: mongoose.Schema.Types.ObjectId, ref: 'List' }]
 });
 
 userSchema.methods.generateHash = function(password) {
