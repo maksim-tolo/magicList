@@ -84,9 +84,10 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
     		$scope.accountSync();
 		});
 
-		$scope.currentTaskNumber = null;
+		$scope.minDate = new Date;
 		$scope.newTaskName = "";
 		$scope.showComplitedTasks = false;
+		$scope.currentTaskNumber = null;
 		$scope.rooms = $rootScope.user.lists.map(function(el) {
 			return el._id;
 		}).concat($rootScope.user.inbox.map(function(el) {
@@ -365,6 +366,28 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
                 });
 		}
 
+		$scope.showTaskProperties = function (taskNumber) {
+			$scope.currentTaskNumber=taskNumber;
+		}
+
+		$scope.openDatepicker = function($event) {
+			$event.preventDefault();
+			$event.stopPropagation();
+			$scope.openedDatepicker = true;
+		};
+
+		$scope.dateOptions = {
+			startingDay: 1
+		};
+
+		$scope.updateDate = function () {
+			if (!$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].deadline) $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].deadline="";
+			AppRoute.updateDate( { taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, newDate: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].deadline } )
+				.success(function() {
+					io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+            	});
+		}
+
 }]);
 
 magicListcontrollers.controller('addListCtrl', ['$scope', '$modalInstance',
@@ -471,29 +494,4 @@ magicListcontrollers.controller('leaveListCtrl', ['$scope', '$rootScope', '$moda
 	$scope.cancel = function () {
 		$modalInstance.dismiss('cancel');
 	};
-}]);
-
-magicListcontrollers.controller('datepickerCtrl', ['$scope', 'AppRoute', '$rootScope',
-	function ($scope, AppRoute, $rootScope) {
-
-	$scope.minDate = new Date;
-
-	$scope.open = function($event) {
-		$event.preventDefault();
-		$event.stopPropagation();
-		$scope.opened = true;
-	};
-
-	$scope.dateOptions = {
-		startingDay: 1
-	};
-
-	$scope.updateDate = function (task) {
-		if (!task.deadline) task.deadline="";
-		AppRoute.updateDate( { taskId: task._id, newDate: task.deadline } )
-			.success(function() {
-				io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
-            });
-	}
-
 }]);

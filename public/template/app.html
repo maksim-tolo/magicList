@@ -141,14 +141,14 @@
 				<input class="addTask" type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
 			</div>
 			<ul class="tasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.currentTaskNumber=$index" ng-show="!task.complited">
+				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.showTaskProperties($index)" ng-show="!task.complited">
 					<span class="icon-radio-unchecked" ng-click="$parent.changeTaskStatus($index)"></span>
 					<div>{{task.taskName}}</div>
 				</li>
 			</ul>
 			<div class="showComplitedTasksButton" ng-click="showComplitedTasks=!showComplitedTasks" ng-show="calcNumberOfActiveTasks(user.lists[currentListNumber])!=user.lists[currentListNumber].tasks.length">Показать завершённые задачи</div>
 			<ul class="tasks complitedTasks" ng-show="showComplitedTasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.currentTaskNumber=$index" ng-show="task.complited">
+				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.showTaskProperties($index)" ng-show="task.complited">
 					<span class="icon-circle-check" ng-click="$parent.changeTaskStatus($index)"></span>
 					<div>{{task.taskName}}</div>
 				</li>
@@ -156,24 +156,22 @@
 		</div>
 	</main>
 
-	<ul id="TaskProperties" ng-show="currentTaskNumber!==null">
-		<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-show="$parent.showTaskConfiguration($index)">
+	<div id="TaskProperties" ng-show="currentTaskNumber!==null">
 			<div class="propertiesHeader">
-				<span ng-class="{ 'icon-circle-check': task.complited, 'icon-radio-unchecked': !task.complited }" ng-click="$parent.changeTaskStatus($index)"></span>
-				<div>{{task.taskName}}</div>
-				<span class="glyphicon glyphicon-remove-circle" ng-click="$parent.currentTaskNumber=null"></span>
+				<span ng-class="{ 'icon-circle-check': user.lists[currentListNumber].tasks[currentTaskNumber].complited, 'icon-radio-unchecked': !user.lists[currentListNumber].tasks[currentTaskNumber].complited }" ng-click="changeTaskStatus(currentTaskNumber)"></span>
+				<div>{{user.lists[currentListNumber].tasks[currentTaskNumber].taskName}}</div>
+				<span class="glyphicon glyphicon-remove-circle" ng-click="currentTaskNumber=null"></span>
 			</div>
 			<div class="propertiesBody">
-				<div ng-controller="datepickerCtrl" class="datepicker">
+				<div class="datepicker">
 					<p class="input-group">
-						<input ng-change="updateDate(task)" placeholder="Установить срок" ng-disabled="true" type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="task.deadline" is-open="opened" min-date="minDate" datepicker-options="dateOptions" ng-required="true" close-text="Закрыть" clear-text="Очистить" current-text="Сегодня">
+						<input ng-change="updateDate()" placeholder="Установить срок" ng-disabled="true" type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="user.lists[currentListNumber].tasks[currentTaskNumber].deadline" is-open="openedDatepicker" min-date="minDate" datepicker-options="dateOptions" ng-required="true" close-text="Закрыть" clear-text="Очистить" current-text="Сегодня">
 						<span class="input-group-btn">
-							<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+							<button type="button" class="btn btn-default" ng-click="openDatepicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 						</span>
 					</p>
 				</div>
 			</div>
-		</li>
-	</ul>
+	</div>
 
 </div>
