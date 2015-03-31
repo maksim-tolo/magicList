@@ -59,6 +59,10 @@ AppService.factory('AppRoute', ['$http',
 
 			removeUserFromList : function (data) {
 				return $http.post('/api/removeUserFromList', data);
+			},
+
+			updateDate : function (data) {
+				return $http.post('/api/updateDate', data);
 			}
 
 		}       

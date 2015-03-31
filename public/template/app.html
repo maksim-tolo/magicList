@@ -26,7 +26,7 @@
 
 <script type="text/ng-template" id="removeList.html">
 	<div class="modal-body">
-		<h4 class="modal-title">{{listName}} будет удалён навсегда</h4>
+		<h4 class="modal-title modalTitle">{{listName}} будет удалён навсегда</h4>
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-danger" ng-click="save()">Удалить список</button>
@@ -36,7 +36,7 @@
 
 <script type="text/ng-template" id="leaveList.html">
 	<div class="modal-body">
-		<h4 class="modal-title">Вы действительно хотите покинуть список {{listName}}?</h4>
+		<h4 class="modal-title modalTitle">Вы действительно хотите покинуть список {{listName}}?</h4>
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-danger" ng-click="save()">Покинуть список</button>
@@ -45,54 +45,54 @@
 </script>
 
 <script type="text/ng-template" id="addListMembers.html">
-<form name="addMembersForm" novalidate>
-	<div class="modal-header">
-		<h3 class="modal-title membersListTitle">Добавить участников</h3>
-		<div class="form-group" ng-class="{ 'has-error' : userIsAlreadyInList || userIsNotExist }">
-			<input type="email" name="email" class="form-control" placeholder="Введите email нового участника" ng-model="newMemberEmail" ng-change="userIsNotExist=false; userIsAlreadyInList=false" autofocus></input>
-			<p ng-show="userIsNotExist" class="help-block">Пользователя с данным email не существует.</p>
-			<p ng-show="userIsAlreadyInList" class="help-block">Пользователь уже является участником списка.</p>
+	<form name="addMembersForm" novalidate>
+		<div class="modal-header">
+			<h3 class="modal-title membersListTitle">Добавить участников</h3>
+			<div class="form-group" ng-class="{ 'has-error' : userIsAlreadyInList || userIsNotExist }">
+				<input type="email" name="email" class="form-control" placeholder="Введите email нового участника" ng-model="newMemberEmail" ng-change="userIsNotExist=false; userIsAlreadyInList=false" autofocus></input>
+				<p ng-show="userIsNotExist" class="help-block">Пользователя с данным email не существует.</p>
+				<p ng-show="userIsAlreadyInList" class="help-block">Пользователь уже является участником списка.</p>
+			</div>
 		</div>
-	</div>
-	<div class="modal-body">
-		<ul class="membersList">
-			<li ng-repeat="member in listMembers">
-				<span class="glyphicon glyphicon-user"></span>
-				{{member}}
-			</li>
-		</ul>
-	</div>
-	<div class="modal-footer membersListFooter">
-		<button class="btn btn-primary" ng-disabled="!newMemberEmail" ng-click="addMember()">Добавить</button>
-		<button class="btn btn-primary" ng-click="cancel()">Готово</button>
-	</div>
-</form>
+		<div class="modal-body">
+			<ul class="membersList">
+				<li ng-repeat="member in listMembers">
+					<span class="glyphicon glyphicon-user"></span>
+					{{member}}
+				</li>
+			</ul>
+		</div>
+		<div class="modal-footer membersListFooter">
+			<button class="btn btn-primary" ng-disabled="!newMemberEmail" ng-click="addMember()">Добавить</button>
+			<button class="btn btn-primary" ng-click="cancel()">Готово</button>
+		</div>
+	</form>
 </script>
 
 <script type="text/ng-template" id="changeListMembers.html">
-<form name="addMembersForm" novalidate>
-	<div class="modal-header">
-		<h3 class="modal-title membersListTitle">Изменить участников</h3>
-		<div class="form-group" ng-class="{ 'has-error' : userIsAlreadyInList || userIsNotExist }">
-			<input type="email" name="email" class="form-control" placeholder="Введите email нового участника" ng-model="newMemberEmail" ng-change="userIsNotExist=false; userIsAlreadyInList=false" autofocus></input>
-			<p ng-show="userIsNotExist" class="help-block">Пользователя с данным email не существует.</p>
-			<p ng-show="userIsAlreadyInList" class="help-block">Пользователь уже является участником списка.</p>
+	<form name="addMembersForm" novalidate>
+		<div class="modal-header">
+			<h3 class="modal-title membersListTitle">Изменить участников</h3>
+			<div class="form-group" ng-class="{ 'has-error' : userIsAlreadyInList || userIsNotExist }">
+				<input type="email" name="email" class="form-control" placeholder="Введите email нового участника" ng-model="newMemberEmail" ng-change="userIsNotExist=false; userIsAlreadyInList=false" autofocus></input>
+				<p ng-show="userIsNotExist" class="help-block">Пользователя с данным email не существует.</p>
+				<p ng-show="userIsAlreadyInList" class="help-block">Пользователь уже является участником списка.</p>
+			</div>
 		</div>
-	</div>
-	<div class="modal-body">
-		<ul class="membersList">
-			<li ng-repeat="member in listMembers" class="clearfix">
-				<span class="glyphicon glyphicon-user"></span>
-				<span>{{member}}</span>
-				<span class="glyphicon glyphicon-remove-circle" ng-click="removeUserFromList(member)" ng-show="member!=user.email"></span>
-			</li>
-		</ul>
-	</div>
-	<div class="modal-footer membersListFooter">
-		<button class="btn btn-primary" ng-disabled="!newMemberEmail" ng-click="addMember()">Добавить</button>
-		<button class="btn btn-primary" ng-click="cancel()">Готово</button>
-	</div>
-</form>
+		<div class="modal-body">
+			<ul class="membersList">
+				<li ng-repeat="member in listMembers" class="clearfix">
+					<span class="glyphicon glyphicon-user"></span>
+					<span>{{member}}</span>
+					<span class="glyphicon glyphicon-remove-circle" ng-click="removeUserFromList(member)" ng-show="member!=user.email"></span>
+				</li>
+			</ul>
+		</div>
+		<div class="modal-footer membersListFooter">
+			<button class="btn btn-primary" ng-disabled="!newMemberEmail" ng-click="addMember()">Добавить</button>
+			<button class="btn btn-primary" ng-click="cancel()">Готово</button>
+		</div>
+	</form>
 </script>
 
 <div id="app">
@@ -112,7 +112,7 @@
 			</div>
 		</div>
 		<ul class="inbox" ng-show="user.inbox.length">
-			<li ng-repeat="inboxList in user.inbox" class="clearfix">
+			<li ng-repeat="inboxList in user.inbox">
 				<div>{{inboxList.listName}}</div>
 				<span class="inboxButtons">
 					<button class="btn btn-xs btn-primary" ng-click="confirmInboxList(inboxList)">
@@ -125,7 +125,7 @@
 			</li>
 		</ul>
 		<ul class="lists">
-			<li class="clearfix" ng-repeat="list in user.lists" ng-click="$parent.changeActiveList($index)" context-menu="$parent.menuOptions($index)" ng-class="{ 'active' : $parent.addActiveClass($index)}">
+			<li ng-repeat="list in user.lists" ng-click="$parent.changeActiveList($index)" context-menu="$parent.menuOptions($index)" ng-class="{ 'active' : $parent.addActiveClass($index)}">
 				<span ng-class="{'icon-file' : list.membersEmail.length==1, 'icon-copy' : list.membersEmail.length!=1}"></span>
 				<span class="listName" popover="I appeared on mouse enter!" popover-trigger="mouseenter" popover-placement="right">{{list.listName}}</span>
 				<span ng-show="calcNumberOfActiveTasks(list)" class="numberOfTasks">{{calcNumberOfActiveTasks(list)}}</span>
@@ -135,20 +135,20 @@
 		<button class="btn btn-default add-list" ng-click="addList()">+</button>
 	</div>
 
-	<main id="main" ng-click="currentTaskNumber=null">
-		<div>
+	<main id="main">
+		<div ng-class="{ 'mainWidthTaskProperties': currentTaskNumber!==null }">
 			<div>
 				<input class="addTask" type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
 			</div>
 			<ul class="tasks">
-				<li class="clearfix" ng-repeat="task in user.lists[currentListNumber].tasks" ng-dblclick="$parent.currentTaskNumber=$index" ng-show="!task.complited">
+				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.currentTaskNumber=$index" ng-show="!task.complited">
 					<span class="icon-radio-unchecked" ng-click="$parent.changeTaskStatus($index)"></span>
 					<div>{{task.taskName}}</div>
 				</li>
 			</ul>
 			<div class="showComplitedTasksButton" ng-click="showComplitedTasks=!showComplitedTasks" ng-show="calcNumberOfActiveTasks(user.lists[currentListNumber])!=user.lists[currentListNumber].tasks.length">Показать завершённые задачи</div>
 			<ul class="tasks complitedTasks" ng-show="showComplitedTasks">
-				<li class="clearfix" ng-repeat="task in user.lists[currentListNumber].tasks" ng-dblclick="$parent.currentTaskNumber=$index" ng-show="task.complited">
+				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.currentTaskNumber=$index" ng-show="task.complited">
 					<span class="icon-circle-check" ng-click="$parent.changeTaskStatus($index)"></span>
 					<div>{{task.taskName}}</div>
 				</li>
@@ -158,7 +158,21 @@
 
 	<ul id="TaskProperties" ng-show="currentTaskNumber!==null">
 		<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-show="$parent.showTaskConfiguration($index)">
-			{{task.taskName}}
+			<div class="propertiesHeader">
+				<span ng-class="{ 'icon-circle-check': task.complited, 'icon-radio-unchecked': !task.complited }" ng-click="$parent.changeTaskStatus($index)"></span>
+				<div>{{task.taskName}}</div>
+				<span class="glyphicon glyphicon-remove-circle" ng-click="$parent.currentTaskNumber=null"></span>
+			</div>
+			<div class="propertiesBody">
+				<div ng-controller="datepickerCtrl" class="datepicker">
+					<p class="input-group">
+						<input ng-change="updateDate(task)" placeholder="Установить срок" ng-disabled="true" type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="task.deadline" is-open="opened" min-date="minDate" datepicker-options="dateOptions" ng-required="true" close-text="Закрыть" clear-text="Очистить" current-text="Сегодня">
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</p>
+				</div>
+			</div>
 		</li>
 	</ul>
 

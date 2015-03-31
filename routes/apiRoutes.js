@@ -26,4 +26,6 @@ router.post('/leaveList', apiController.leaveList);
 
 router.post('/removeUserFromList', apiController.removeUserFromList);
 
+router.post('/updateDate', apiController.updateDate);
+
 module.exports = router;

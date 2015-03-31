@@ -139,4 +139,11 @@ apiController.removeUserFromList = function (req, res) {
     });    
 };
 
+apiController.updateDate = function (req, res) {
+    List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.deadline': req.body.newDate }}, function(err){
+        if (err) return console.error(err);
+        res.end();
+    });   
+};
+
 module.exports = apiController;

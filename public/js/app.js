@@ -8,7 +8,8 @@ var magicListApp = angular.module('magicListApp', [
   'ngStorage',
   'ui.bootstrap.contextMenu',
   'ui.bootstrap.dropdown',
-  'magicListDirectives'
+  'magicListDirectives',
+  'ui.bootstrap.datepicker'
   ]);
 
 magicListApp.config(['$stateProvider', '$urlRouterProvider',

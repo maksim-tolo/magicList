@@ -197,7 +197,8 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
                 			if ($rootScope.user.lists.length==1) $scope.currentListNumber=0;
                 			else $scope.currentListNumber--;
                 		};
-                		$rootScope.user.lists.splice(index, 1);               		         	
+                		$rootScope.user.lists.splice(index, 1);
+                		$scope.currentTaskNumber = null;
             	});
 
 			}, function () {
@@ -470,4 +471,29 @@ magicListcontrollers.controller('leaveListCtrl', ['$scope', '$rootScope', '$moda
 	$scope.cancel = function () {
 		$modalInstance.dismiss('cancel');
 	};
+}]);
+
+magicListcontrollers.controller('datepickerCtrl', ['$scope', 'AppRoute', '$rootScope',
+	function ($scope, AppRoute, $rootScope) {
+
+	$scope.minDate = new Date;
+
+	$scope.open = function($event) {
+		$event.preventDefault();
+		$event.stopPropagation();
+		$scope.opened = true;
+	};
+
+	$scope.dateOptions = {
+		startingDay: 1
+	};
+
+	$scope.updateDate = function (task) {
+		if (!task.deadline) task.deadline="";
+		AppRoute.updateDate( { taskId: task._id, newDate: task.deadline } )
+			.success(function() {
+				io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+            });
+	}
+
 }]);
