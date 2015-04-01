@@ -1,6 +1,6 @@
 var magicListcontrollers = angular.module('magicListcontrollers', []);
 
-magicListcontrollers.controller('login', ['$scope', 'AppRoute', '$state', '$localStorage', '$rootScope', '$window',
+magicListcontrollers.controller('home', ['$scope', 'AppRoute', '$state', '$localStorage', '$rootScope', '$window',
 	function($scope, AppRoute, $state, $localStorage, $rootScope, $window) {
 		$scope.user = {
 			email: "",
@@ -77,8 +77,8 @@ magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$loc
 
 	}]);
 
-magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParams', 'AppRoute', '$rootScope', '$state', '$localStorage',
-	function($scope, $modal, $log, $stateParams, AppRoute, $rootScope, $state, $localStorage) {
+magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParams', 'AppRoute', '$rootScope', '$state', '$localStorage', '$upload',
+	function($scope, $modal, $log, $stateParams, AppRoute, $rootScope, $state, $localStorage, $upload) {
 
 		io.on('updateUser', function() {
     		$scope.accountSync();
@@ -86,6 +86,7 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 		$scope.minDate = new Date;
 		$scope.newTaskName = "";
+		$scope.newSubtaskName = "";
 		$scope.showComplitedTasks = false;
 		$scope.currentTaskNumber = null;
 		$scope.rooms = $rootScope.user.lists.map(function(el) {
@@ -107,6 +108,30 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 		} else {
 			$scope.currentListNumber = 0;
 		}
+
+		$scope.$watch('files', function () {
+        	$scope.upload($scope.files);
+    	});
+
+    	$scope.upload = function (files) {
+        	if (files && files.length) {
+            	for (var i = 0; i < files.length; i++) {
+                	var file = files[i];
+                	$upload.upload({
+                    	url: '/upload',
+                    	fields: {'taskId': $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id},
+                    	file: file
+                	}).progress(function (evt) {
+                    	var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                    	console.log('progress: ' + progressPercentage + '% ' + evt.config.file.name);
+                	}).success(function (data, status, headers, config) {
+                		$rootScope.user.lists[$scope.currentListNumber]=data;
+                    	console.log('file ' + config.file.name + 'uploaded. Response: ' + data);
+                    	io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+                	});
+            	}
+        	}
+    	};
 
 		$scope.addActiveClass = function(index) {
 			return index==$scope.currentListNumber ? true : false;
@@ -141,6 +166,7 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 				AppRoute.createList({ listName: newListName, ownerId: $rootScope.user._id, ownerEmail: $rootScope.user.email })
 					.success(function(resData) {
                 		$rootScope.user.lists.push(resData);
+                		io.emit('userRooms', $rootScope.user.lists[$scope.currentListNumber]._id);
                 		if($rootScope.user.lists.length===1) $state.go('app', { listId: $rootScope.user.lists[0]._id });
             	});
 
@@ -261,7 +287,7 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 		}
 
 		$scope.changeTaskStatus = function (index) {
-			AppRoute.changeTaskStatus({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[index]._id })
+			AppRoute.changeTaskStatus({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[index]._id, currentTaskStatus: $rootScope.user.lists[$scope.currentListNumber].tasks[index].complited })
 				.success(function() {
          			$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited=!$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited;
          			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
@@ -325,7 +351,7 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 		$scope.endSession = function () {
 			$localStorage.user=null;
-			$state.go('login');
+			$state.go('home');
 		}
 
 		$scope.accountSync = function () {
@@ -333,12 +359,15 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 				.success(function(resData) {
 					$localStorage.user = resData;
 					$rootScope.user = $localStorage.user;
+					if (!$rootScope.user.lists[$scope.currentListNumber]) {
+						if($rootScope.user.lists.length) $state.go('app', { listId: $rootScope.user.lists[0]._id });
+						else $state.go('app');
+					}
+					$scope.rooms = $rootScope.user.inbox.map(function(el) {
+						return el._id;
+					});
 
-					$scope.rooms = $rootScope.user.lists.map(function(el) {
-						return el._id;
-					}).concat($rootScope.user.inbox.map(function(el) {
-						return el._id;
-					}));
+					if (!$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]) $scope.currentTaskNumber=null;
 
 					if($rootScope.user.inbox.length) io.emit('listRooms', $scope.rooms);
                 });
@@ -366,10 +395,6 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
                 });
 		}
 
-		$scope.showTaskProperties = function (taskNumber) {
-			$scope.currentTaskNumber=taskNumber;
-		}
-
 		$scope.openDatepicker = function($event) {
 			$event.preventDefault();
 			$event.stopPropagation();
@@ -388,6 +413,117 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
             	});
 		}
 
+		$scope.updateDescription = function () {
+			if(!$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].description) $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].description="";
+			AppRoute.updateDescription( { taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, newDescription: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].description } )
+				.success(function() {
+					io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+            	});
+		}
+
+		$scope.addSubtask = function() {
+			if($scope.newSubtaskName) {
+
+				AppRoute.createSubtask({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, subtaskName: $scope.newSubtaskName })
+					.success(function(resData) {
+                		$rootScope.user.lists[$scope.currentListNumber]=resData;
+                		io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);             	
+            	});
+
+				$scope.newSubtaskName="";
+			}
+		};
+
+		$scope.changeSubtaskStatus = function(index) {
+
+			var subtasks = $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].subtasks;
+			subtasks[index].complited=!subtasks[index].complited;
+
+			AppRoute.changeSubtask({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, subtasks: subtasks })
+				.success(function() {
+         			$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].subtasks[index].complited=subtasks[index].complited;
+         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+            });
+		}
+
+		$scope.changeSubtask = function (index) {
+			AppRoute.changeSubtask({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, subtasks: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].subtasks })
+				.success(function() {
+         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+            });
+		}
+
+		$scope.checkAttachments = function (el) {
+			return el.extension == ('jpg'||'png'||'jpeg') ? true : false;
+		}
+
+		$scope.removeFile = function (file, index, size) {
+
+			var modalInstance = $modal.open({
+      		templateUrl: 'delete.html',
+      		controller: 'deleteCtrl',
+      		size: size
+    		});
+
+			modalInstance.result.then(function () {
+
+				AppRoute.removeFile({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, file: file })
+				.success(function() {
+					$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].attachments.splice(index, 1);
+         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+            });
+
+			}, function () {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+
+		}
+
+		$scope.removeSubtask = function (subtask, index, size) {
+
+			var modalInstance = $modal.open({
+      		templateUrl: 'delete.html',
+      		controller: 'deleteCtrl',
+      		size: size
+    		});
+
+			modalInstance.result.then(function () {
+
+				AppRoute.removeSubtask({ subtask: subtask, taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id })
+				.success(function() {
+					$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].subtasks.splice(index, 1);
+         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+            });
+
+			}, function () {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+
+		}
+
+		$scope.removeTask = function (size) {
+
+			var modalInstance = $modal.open({
+      		templateUrl: 'delete.html',
+      		controller: 'deleteCtrl',
+      		size: size
+    		});
+
+			modalInstance.result.then(function () {
+
+				AppRoute.removeTask({ task: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber] })
+				.success(function() {
+					$rootScope.user.lists[$scope.currentListNumber].tasks.splice($scope.currentTaskNumber, 1);
+					$scope.currentTaskNumber=null;
+         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+            });
+
+			}, function () {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+
+		}
+
 }]);
 
 magicListcontrollers.controller('addListCtrl', ['$scope', '$modalInstance',
@@ -396,6 +532,18 @@ magicListcontrollers.controller('addListCtrl', ['$scope', '$modalInstance',
 	$scope.newListName="";
 	$scope.save = function () {
 		$modalInstance.close($scope.newListName);
+	};
+
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+}]);
+
+magicListcontrollers.controller('deleteCtrl', ['$scope', '$modalInstance',
+	function ($scope, $modalInstance) {
+
+	$scope.save = function () {
+		$modalInstance.close();
 	};
 
 	$scope.cancel = function () {

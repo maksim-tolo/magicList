@@ -2,6 +2,7 @@ var express = require('express.io');
 var app = express();
 app.http().io();
 
+var multer  = require('multer');
 var mongoose = require('mongoose');
 var morgan = require('morgan');     //logger
 var bodyParser = require('body-parser');
@@ -11,6 +12,7 @@ var passport = require('passport');
 
 var apiRoutes = require('./routes/apiRoutes');
 var mainRoutes = require('./routes/mainRoutes');
+var apiController = require('./controllers/apiController');
 
 var port = process.env.PORT || 3000;
 
@@ -19,6 +21,17 @@ var database = require('./config/database.js');
 mongoose.connect(database.url);
 
 require('./config/passport')(passport);
+
+app.use(multer({
+  	dest: './public/uploads/',
+  	rename: function (fieldname, filename) {
+    	return filename.replace(/\W+/g, '-').toLowerCase() + Date.now()
+  	},
+  	limits: {
+  		fieldSize: 500
+	},
+	onFileUploadComplete: apiController.addFileToTask
+}));
 
 app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));

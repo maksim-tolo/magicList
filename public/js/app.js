@@ -9,18 +9,19 @@ var magicListApp = angular.module('magicListApp', [
   'ui.bootstrap.contextMenu',
   'ui.bootstrap.dropdown',
   'magicListDirectives',
-  'ui.bootstrap.datepicker'
+  'ui.bootstrap.datepicker',
+  'angularFileUpload'
   ]);
 
 magicListApp.config(['$stateProvider', '$urlRouterProvider',
  function($stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise("/login");
+  $urlRouterProvider.otherwise("/home");
 
   $stateProvider
-  .state('login', {
-    url: "/login",
-    templateUrl: "template/login.html",
-    controller: "login"
+  .state('home', {
+    url: "/home",
+    templateUrl: "template/home.html",
+    controller: "home"
   })
   .state('signup', {
     url: "/signup",

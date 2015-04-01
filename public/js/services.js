@@ -25,6 +25,10 @@ AppService.factory('AppRoute', ['$http',
 				return $http.put('/api/createTask', data);
 			},
 
+			createSubtask : function(data) {
+				return $http.put('/api/createSubtask', data);
+			},
+
 			changeListName : function(data) {
 				return $http.post('/api/changeListName', data);
 			},
@@ -63,6 +67,26 @@ AppService.factory('AppRoute', ['$http',
 
 			updateDate : function (data) {
 				return $http.post('/api/updateDate', data);
+			},
+
+			updateDescription : function (data) {
+				return $http.post('/api/updateDescription', data);
+			},
+
+			changeSubtask : function (data) {
+				return $http.post('/api/changeSubtask', data);
+			},
+
+			removeFile : function (data) {
+				return $http.post('/api/removeFile', data);
+			},
+
+			removeTask : function (data) {
+				return $http.post('/api/removeTask', data);
+			},
+
+			removeSubtask : function (data) {
+				return $http.post('/api/removeSubtask', data);
 			}
 
 		}       
@@ -74,7 +98,7 @@ AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope',
 
 		this.checkAccess = function(event, toState, toParams, fromState, fromParams) {
 
-			if ((toState.name=='login' || toState.name=='signup') && $localStorage.user) {
+			if ((toState.name=='home' || toState.name=='signup') && $localStorage.user) {
 				AppRoute.getUser({ userId: $localStorage.user._id })
 					.success(function(resData) {
 						$localStorage.user = resData;
@@ -85,7 +109,7 @@ AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope',
                 	})
                 	.error(function() {
                 		event.preventDefault();
-                		$state.go('login');
+                		$state.go('home');
                 	});
 			} else if ($localStorage.user) {
 				$rootScope.user = $localStorage.user;

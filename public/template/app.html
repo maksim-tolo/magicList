@@ -44,6 +44,16 @@
 	</div>
 </script>
 
+<script type="text/ng-template" id="delete.html">
+	<div class="modal-body">
+		<h4 class="modal-title modalTitle">Поддтвердите удаление</h4>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-danger" ng-click="save()">Удалить</button>
+		<button class="btn btn-primary" ng-click="cancel()">Отмена</button>
+	</div>
+</script>
+
 <script type="text/ng-template" id="addListMembers.html">
 	<form name="addMembersForm" novalidate>
 		<div class="modal-header">
@@ -98,6 +108,7 @@
 <div id="app">
 
 	<div id="sidebar">
+
 		<div class="userInfo">
 			<div class="btn-group" dropdown is-open="status.isopen">
 				<button type="button" dropdown-toggle ng-disabled="disabled">
@@ -111,27 +122,28 @@
 				</ul>
 			</div>
 		</div>
-		<ul class="inbox" ng-show="user.inbox.length">
-			<li ng-repeat="inboxList in user.inbox">
-				<div>{{inboxList.listName}}</div>
-				<span class="inboxButtons">
-					<button class="btn btn-xs btn-primary" ng-click="confirmInboxList(inboxList)">
-						<span class="glyphicon glyphicon-ok"></span>
-					</button>
-					<button class="btn btn-xs btn-danger" ng-click="rejectInboxList(inboxList)">
-						<span class="glyphicon glyphicon-remove"></span>
-					</button>
-				</span>
-			</li>
-		</ul>
-		<ul class="lists">
-			<li ng-repeat="list in user.lists" ng-click="$parent.changeActiveList($index)" context-menu="$parent.menuOptions($index)" ng-class="{ 'active' : $parent.addActiveClass($index)}">
-				<span ng-class="{'icon-file' : list.membersEmail.length==1, 'icon-copy' : list.membersEmail.length!=1}"></span>
-				<span class="listName" popover="I appeared on mouse enter!" popover-trigger="mouseenter" popover-placement="right">{{list.listName}}</span>
-				<span ng-show="calcNumberOfActiveTasks(list)" class="numberOfTasks">{{calcNumberOfActiveTasks(list)}}</span>
-			</li>
-		</ul>
-
+		<div class="lists-scroll">
+			<ul class="inbox" ng-show="user.inbox.length">
+				<li ng-repeat="inboxList in user.inbox">
+					<div>{{inboxList.listName}}</div>
+					<span class="inboxButtons">
+						<button class="btn btn-xs btn-primary" ng-click="confirmInboxList(inboxList)">
+							<i class="glyphicon glyphicon-ok"></i>
+						</button>
+						<button class="btn btn-xs btn-danger" ng-click="rejectInboxList(inboxList)">
+							<i class="glyphicon glyphicon-remove"></i>
+						</button>
+					</span>
+				</li>
+			</ul>
+			<ul class="lists">
+				<li ng-repeat="list in user.lists" ng-click="$parent.changeActiveList($index)" context-menu="$parent.menuOptions($index)" ng-class="{ 'active' : $parent.addActiveClass($index)}">
+					<i ng-class="{'icon-file' : list.membersEmail.length==1, 'icon-copy' : list.membersEmail.length!=1}"></i>
+					<span class="listName" popover="I appeared on mouse enter!" popover-trigger="mouseenter" popover-placement="right">{{list.listName}}</span>
+					<span ng-show="calcNumberOfActiveTasks(list)" class="numberOfTasks">{{calcNumberOfActiveTasks(list)}}</span>
+				</li>
+			</ul>
+		</div>
 		<button class="btn btn-default add-list" ng-click="addList()">+</button>
 	</div>
 
@@ -141,15 +153,15 @@
 				<input class="addTask" type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
 			</div>
 			<ul class="tasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.showTaskProperties($index)" ng-show="!task.complited">
-					<span class="icon-radio-unchecked" ng-click="$parent.changeTaskStatus($index)"></span>
+				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.currentTaskNumber=$index" ng-show="!task.complited">
+					<i class="icon-radio-unchecked" ng-click="$parent.changeTaskStatus($index)"></i>
 					<div>{{task.taskName}}</div>
 				</li>
 			</ul>
 			<div class="showComplitedTasksButton" ng-click="showComplitedTasks=!showComplitedTasks" ng-show="calcNumberOfActiveTasks(user.lists[currentListNumber])!=user.lists[currentListNumber].tasks.length">Показать завершённые задачи</div>
 			<ul class="tasks complitedTasks" ng-show="showComplitedTasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.showTaskProperties($index)" ng-show="task.complited">
-					<span class="icon-circle-check" ng-click="$parent.changeTaskStatus($index)"></span>
+				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.currentTaskNumber=$index" ng-show="task.complited">
+					<i class="icon-circle-check" ng-click="$parent.changeTaskStatus($index)"></i>
 					<div>{{task.taskName}}</div>
 				</li>
 			</ul>
@@ -157,21 +169,53 @@
 	</main>
 
 	<div id="TaskProperties" ng-show="currentTaskNumber!==null">
-			<div class="propertiesHeader">
-				<span ng-class="{ 'icon-circle-check': user.lists[currentListNumber].tasks[currentTaskNumber].complited, 'icon-radio-unchecked': !user.lists[currentListNumber].tasks[currentTaskNumber].complited }" ng-click="changeTaskStatus(currentTaskNumber)"></span>
-				<div>{{user.lists[currentListNumber].tasks[currentTaskNumber].taskName}}</div>
-				<span class="glyphicon glyphicon-remove-circle" ng-click="currentTaskNumber=null"></span>
+		<div class="propertiesHeader">
+			<i ng-class="{ 'icon-circle-check': user.lists[currentListNumber].tasks[currentTaskNumber].complited, 'icon-radio-unchecked': !user.lists[currentListNumber].tasks[currentTaskNumber].complited }" ng-click="changeTaskStatus(currentTaskNumber)"></i>
+			<div>{{user.lists[currentListNumber].tasks[currentTaskNumber].taskName}}</div>
+			<i class="glyphicon glyphicon-trash" ng-click="removeTask('sm')"></i>
+			<i class="glyphicon glyphicon-remove-circle" ng-click="currentTaskNumber=null"></i>
+		</div>
+		<div class="propertiesBody">
+			<div class="datepicker">
+				<p class="input-group" ng-click="openDatepicker($event)">
+					<input ng-change="updateDate()" placeholder="Установить срок" ng-disabled="true" type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="user.lists[currentListNumber].tasks[currentTaskNumber].deadline" is-open="openedDatepicker" min-date="minDate" datepicker-options="dateOptions" ng-required="true" close-text="Закрыть" clear-text="Очистить" current-text="Сегодня">
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button>
+					</span>
+				</p>
 			</div>
-			<div class="propertiesBody">
-				<div class="datepicker">
-					<p class="input-group">
-						<input ng-change="updateDate()" placeholder="Установить срок" ng-disabled="true" type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="user.lists[currentListNumber].tasks[currentTaskNumber].deadline" is-open="openedDatepicker" min-date="minDate" datepicker-options="dateOptions" ng-required="true" close-text="Закрыть" clear-text="Очистить" current-text="Сегодня">
-						<span class="input-group-btn">
-							<button type="button" class="btn btn-default" ng-click="openDatepicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
-						</span>
-					</p>
+			<div class="subtasks">
+				<ul>
+					<li ng-repeat="subtask in user.lists[currentListNumber].tasks[currentTaskNumber].subtasks">
+						<i ng-class="{ 'glyphicon glyphicon-check': subtask.complited, 'glyphicon glyphicon-unchecked': !subtask.complited }" ng-click="changeSubtaskStatus($index)"></i>
+						<input type="text" ng-model="subtask.subtaskName" ng-keyup="$event.keyCode == 13 && changeSubtask($index)" ng-blur="changeSubtask($index)"></input>
+						<i class="glyphicon glyphicon-remove-circle" ng-click="removeSubtask(subtask, $index, 'sm')"></i>
+					</li>
+				</ul>
+				<div>
+					<i class="glyphicon glyphicon-plus"></i>
+					<input type="text" ng-model="newSubtaskName" ng-keyup="$event.keyCode == 13 && addSubtask()" ng-blur="addSubtask()" placeholder="Добавить подзадачу"></input>
 				</div>
 			</div>
+			<div class="description">
+				<textarea placeholder="Добавить описание" ng-model="user.lists[currentListNumber].tasks[currentTaskNumber].description" ng-blur="updateDescription()"></textarea>
+			</div>
+			<div class="fileUpload">
+				<div ng-file-drop ng-file-select ng-model="files" class="drop-box" 
+				drag-over-class="dragover" ng-multiple="true" allow-dir="true"
+				accept=".jpg,.png,.pdf">Добавить файл</div>
+				<div ng-no-file-drop>Drag&Drop не поддерживается вашим браузером</div>
+				<ul>
+					<li ng-repeat="file in user.lists[currentListNumber].tasks[currentTaskNumber].attachments">
+					<i class="glyphicon glyphicon-trash" ng-click="removeFile(file, $index, 'sm')"></i>
+					<a target="_blank" ng-if="checkAttachments(file)" ng-href="{{'uploads/'+file.name}}">
+						<img ng-src="{{'uploads/'+file.name}}"></a>
+					<a target="_blank" ng-if="!checkAttachments(file)" ng-href="{{'uploads/'+file.name}}">
+						<div class="file"><i class="glyphicon glyphicon-list-alt"></i>{{file.originalName}}</div>
+					</a>
+					</li>
+				</ul>
+			</div>
+		</div>
 	</div>
-
 </div>

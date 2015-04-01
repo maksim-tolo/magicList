@@ -18,4 +18,7 @@ router.post('/login', passport.authenticate('local-login'), function(req, res) {
     res.send(req.user);
 });
 
+router.post('/upload', function(req, res) {
+});
+
 module.exports = router;

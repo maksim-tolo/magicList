@@ -9,12 +9,17 @@ var listShema = new mongoose.Schema({
 	[{
 		taskName: String,
 		complited: Boolean,
-		attachments: [],
+		attachments:
+		[{
+			originalName: String,
+			name: String,
+			extension: String
+		}],
 		description: String,
 		deadline: Date,
 		subtasks:
 		[{
-			subtasksName: String,
+			subtaskName: String,
 			complited: Boolean
 		}]
 	}]

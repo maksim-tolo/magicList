@@ -1,5 +1,6 @@
 var User = require('../models/user');
 var List = require('../models/list');
+var fs = require('fs');
 var apiController = {};
 
 apiController.getUser = function (req, res) {
@@ -50,6 +51,11 @@ apiController.changeListName = function (req, res) {
 
 apiController.removeList = function (req, res) {
 	List.findById(req.body.listId, function(err, list) {
+
+        for (var i = 0; i<list.tasks.length; i++) {
+            for (var j = 0; j < list.tasks[i].attachments.length; j++) fs.unlinkSync('./public/uploads/'+list.tasks[i].attachments[j].name);
+        }
+  
         for (var i = 0; i < list.membersEmail.length; i++) {
             User.update({ 'email': list.membersEmail[i] }, { $pull: { 'lists': req.body.listId, 'inbox': req.body.listId } }, function(err){
                 if (err) return console.error(err);
@@ -64,20 +70,17 @@ apiController.removeList = function (req, res) {
 };
 
 apiController.changeTaskStatus = function (req, res) {
-	var previousValue;
-
-    List.findOne({ 'tasks._id': req.body.taskId }, function(err, list) {
+    List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.complited': !req.body.currentTaskStatus }}, function(err){
         if (err) return console.error(err);
-        for (var i = 0; i < list.tasks.length; i++) {
-            if(list.tasks[i]._id==req.body.taskId) {
-                previousValue=list.tasks[i].complited;
-                List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.complited': !previousValue }}, function(err) {
-                    if (err) return console.error(err);
-                });
-                res.end();
-            }
-        };
+        res.end();
+    }); 
+};
+
+apiController.changeSubtask = function (req, res) {
+    List.update({ 'tasks._id': req.body.taskId }, { '$set': {'tasks.$.subtasks': req.body.subtasks } }, function(err){
+        if (err) return console.error(err);
     });
+    res.end();
 };
 
 apiController.addListMember = function (req, res) {
@@ -144,6 +147,69 @@ apiController.updateDate = function (req, res) {
         if (err) return console.error(err);
         res.end();
     });   
+};
+
+apiController.updateDescription = function (req, res) {
+    List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.description': req.body.newDescription }}, function(err){
+        if (err) return console.error(err);
+        res.end();
+    });   
+};
+
+apiController.createSubtask = function (req, res) {
+    List.update({ 'tasks._id': req.body.taskId }, { $push: {'tasks.$.subtasks': { 'subtaskName': req.body.subtaskName, 'complited': false } } }, function(err){
+        if (err) return console.error(err);
+    });
+    List.findOne({ 'tasks._id': req.body.taskId }, function(err, list) {
+        if (err) return console.error(err);
+        res.send(list);
+    });
+};
+
+apiController.addFileToTask = function (file, req, res) {
+    List.update({ 'tasks._id': req.body.taskId }, { $push: {'tasks.$.attachments': { 'originalName': file.originalname, 'name': file.name, 'extension': file.extension } } }, function(err){
+        if (err) return console.error(err);
+    });
+    List.findOne({ 'tasks._id': req.body.taskId }, function(err, list) {
+        if (err) return console.error(err);
+        res.send(list);
+    });
+};
+
+apiController.removeFile = function (req, res) {
+    var filePath = './public/uploads/'+req.body.file.name;
+    fs.unlinkSync(filePath);
+    List.update({ 'tasks._id': req.body.taskId }, { $pull: {'tasks.$.attachments': req.body.file } }, function(err){
+        if (err) return console.error(err);
+        res.end();
+    });
+};
+
+apiController.removeTask = function (req, res) {
+    for (var i = 0; i<req.body.task.attachments.length; i++) {
+        fs.unlinkSync('./public/uploads/'+req.body.task.attachments[i].name);
+        List.update({ 'tasks._id': req.body.taskId }, { $pull: {'tasks.$.attachments': req.body.task.attachments[i] } }, function(err){
+            if (err) return console.error(err);
+        });
+    }
+
+    for (var i = 0; i<req.body.task.subtasks.length; i++) {
+        List.update({ 'tasks._id': req.body.taskId }, { $pull: {'tasks.$.subtasks': req.body.task.subtasks[i] } }, function(err){
+            if (err) return console.error(err);
+        });
+    }
+
+    List.update({ 'tasks._id': req.body.task._id }, { $pull: {'tasks': req.body.task } }, function(err){
+        if (err) return console.error(err);
+        res.end();
+    });
+};
+
+apiController.removeSubtask = function (req, res) {
+    List.update({ 'tasks._id': req.body.taskId }, { $pull: {'tasks.$.subtasks': req.body.subtask } }, function(err){
+        if (err) return console.error(err);
+        res.end();
+    });
 };
 
 module.exports = apiController;
