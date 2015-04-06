@@ -46,7 +46,13 @@ app.use('/', mainRoutes);
 app.use('/api', apiRoutes);
 
 app.io.route('listRooms', function(req) {
-	for (var i = 0; i < req.data.length; i++) req.io.join(req.data[i]);
+	for (var i = 0; i < req.data.length; i++) {
+		req.io.join(req.data[i]);
+	}
+});
+
+app.io.route('leaveListRoom', function(req) {
+	req.io.leave(req.data);
 });
 
 app.io.route('userRooms', function(req) {

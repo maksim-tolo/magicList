@@ -66,7 +66,7 @@
 		</div>
 		<div class="modal-body">
 			<ul class="membersList">
-				<li ng-repeat="member in listMembers">
+				<li ng-repeat="member in user.lists[index].membersEmail">
 					<span class="glyphicon glyphicon-user"></span>
 					{{member}}
 				</li>
@@ -91,7 +91,7 @@
 		</div>
 		<div class="modal-body">
 			<ul class="membersList">
-				<li ng-repeat="member in listMembers" class="clearfix">
+				<li ng-repeat="member in user.lists[index].membersEmail" class="clearfix">
 					<span class="glyphicon glyphicon-user"></span>
 					<span>{{member}}</span>
 					<span class="glyphicon glyphicon-remove-circle" ng-click="removeUserFromList(member)" ng-show="member!=user.email"></span>
@@ -153,14 +153,14 @@
 				<input class="addTask" type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
 			</div>
 			<ul class="tasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.currentTaskNumber=$index" ng-show="!task.complited">
+				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.$parent.currentTaskNumber=$index" ng-show="!task.complited">
 					<i class="icon-radio-unchecked" ng-click="$parent.changeTaskStatus($index)"></i>
 					<div>{{task.taskName}}</div>
 				</li>
 			</ul>
 			<div class="showComplitedTasksButton" ng-click="showComplitedTasks=!showComplitedTasks" ng-show="calcNumberOfActiveTasks(user.lists[currentListNumber])!=user.lists[currentListNumber].tasks.length">Показать завершённые задачи</div>
 			<ul class="tasks complitedTasks" ng-show="showComplitedTasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.currentTaskNumber=$index" ng-show="task.complited">
+				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.$parent.currentTaskNumber=$index" ng-show="task.complited">
 					<i class="icon-circle-check" ng-click="$parent.changeTaskStatus($index)"></i>
 					<div>{{task.taskName}}</div>
 				</li>
@@ -173,7 +173,7 @@
 			<i ng-class="{ 'icon-circle-check': user.lists[currentListNumber].tasks[currentTaskNumber].complited, 'icon-radio-unchecked': !user.lists[currentListNumber].tasks[currentTaskNumber].complited }" ng-click="changeTaskStatus(currentTaskNumber)"></i>
 			<div>{{user.lists[currentListNumber].tasks[currentTaskNumber].taskName}}</div>
 			<i class="glyphicon glyphicon-trash" ng-click="removeTask('sm')"></i>
-			<i class="glyphicon glyphicon-remove-circle" ng-click="currentTaskNumber=null"></i>
+			<i class="glyphicon glyphicon-remove-circle" ng-click="$parent.currentTaskNumber=null"></i>
 		</div>
 		<div class="propertiesBody">
 			<div class="datepicker">

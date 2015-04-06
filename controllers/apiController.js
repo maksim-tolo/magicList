@@ -45,15 +45,18 @@ apiController.createTask = function (req, res) {
 apiController.changeListName = function (req, res) {
 	List.findByIdAndUpdate(req.body.listId, { listName: req.body.listName }, function(err){
         if (err) return console.error(err);
-        res.end();
     });
+
+    res.end();
 };
 
 apiController.removeList = function (req, res) {
 	List.findById(req.body.listId, function(err, list) {
 
         for (var i = 0; i<list.tasks.length; i++) {
-            for (var j = 0; j < list.tasks[i].attachments.length; j++) fs.unlinkSync('./public/uploads/'+list.tasks[i].attachments[j].name);
+            for (var j = 0; j < list.tasks[i].attachments.length; j++) fs.unlink('./public/uploads/'+list.tasks[i].attachments[j].name, function(err){
+                if (err) return console.error(err);
+            });
         }
   
         for (var i = 0; i < list.membersEmail.length; i++) {
@@ -65,21 +68,24 @@ apiController.removeList = function (req, res) {
 
     List.findByIdAndRemove(req.body.listId, function(err){
         if (err) return console.error(err);
-        res.end();
     });
+
+    res.end();
 };
 
 apiController.changeTaskStatus = function (req, res) {
     List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.complited': !req.body.currentTaskStatus }}, function(err){
         if (err) return console.error(err);
-        res.end();
-    }); 
+    });
+
+    res.end();
 };
 
 apiController.changeSubtask = function (req, res) {
     List.update({ 'tasks._id': req.body.taskId }, { '$set': {'tasks.$.subtasks': req.body.subtasks } }, function(err){
         if (err) return console.error(err);
     });
+
     res.end();
 };
 
@@ -89,8 +95,9 @@ apiController.addListMember = function (req, res) {
     });
     User.update({ 'email': req.body.userEmail }, { $push: {'inbox': req.body.listId } }, function(err){
         if (err) return console.error(err);
-        res.end();
     });
+
+    res.end();
 };
 
 apiController.confirmInboxList = function (req, res) {
@@ -102,8 +109,9 @@ apiController.confirmInboxList = function (req, res) {
         List.findByIdAndUpdate(req.body.listId, { $push: {'members': user._id } }, function(err){
             if (err) return console.error(err);
         });
-        res.end();
     });
+
+    res.end();
 };
 
 apiController.rejectInboxList = function (req, res) {
@@ -112,8 +120,9 @@ apiController.rejectInboxList = function (req, res) {
     });
     User.update({ 'email': req.body.userEmail }, { $pull: {'inbox': req.body.listId } }, function(err){
         if (err) return console.error(err);
-        res.end();
     });
+
+    res.end();
 };
 
 apiController.leaveList = function (req, res) {
@@ -125,8 +134,9 @@ apiController.leaveList = function (req, res) {
         List.findByIdAndUpdate(req.body.listId, { $pull: {'membersEmail': req.body.userEmail, 'members': user._id } }, function(err){
             if (err) return console.error(err);
         });
-        res.end();
     });
+
+    res.end();
 };
 
 apiController.removeUserFromList = function (req, res) {
@@ -169,16 +179,18 @@ apiController.createSubtask = function (req, res) {
 apiController.addFileToTask = function (file, req, res) {
     List.update({ 'tasks._id': req.body.taskId }, { $push: {'tasks.$.attachments': { 'originalName': file.originalname, 'name': file.name, 'extension': file.extension } } }, function(err){
         if (err) return console.error(err);
+        List.findOne({ 'tasks._id': req.body.taskId }, function(err, list) {
+            if (err) return console.error(err);
+            res.send(list);
+        });
     });
-    List.findOne({ 'tasks._id': req.body.taskId }, function(err, list) {
-        if (err) return console.error(err);
-        res.send(list);
-    });
+    
 };
 
 apiController.removeFile = function (req, res) {
-    var filePath = './public/uploads/'+req.body.file.name;
-    fs.unlinkSync(filePath);
+    fs.unlink('./public/uploads/'+req.body.file.name, function(err){
+        if (err) return console.error(err);
+    });
     List.update({ 'tasks._id': req.body.taskId }, { $pull: {'tasks.$.attachments': req.body.file } }, function(err){
         if (err) return console.error(err);
         res.end();
@@ -187,7 +199,9 @@ apiController.removeFile = function (req, res) {
 
 apiController.removeTask = function (req, res) {
     for (var i = 0; i<req.body.task.attachments.length; i++) {
-        fs.unlinkSync('./public/uploads/'+req.body.task.attachments[i].name);
+        fs.unlink('./public/uploads/'+req.body.task.attachments[i].name, function(err){
+            if (err) return console.error(err);
+        });
         List.update({ 'tasks._id': req.body.taskId }, { $pull: {'tasks.$.attachments': req.body.task.attachments[i] } }, function(err){
             if (err) return console.error(err);
         });

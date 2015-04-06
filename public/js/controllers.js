@@ -77,38 +77,14 @@ magicListcontrollers.controller('signup', ['$scope', '$state', 'AppRoute', '$loc
 
 	}]);
 
-magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParams', 'AppRoute', '$rootScope', '$state', '$localStorage', '$upload',
-	function($scope, $modal, $log, $stateParams, AppRoute, $rootScope, $state, $localStorage, $upload) {
-
-		io.on('updateUser', function() {
-    		$scope.accountSync();
-		});
+magicListcontrollers.controller('app', ['$scope', '$modal', '$log', 'AppRoute', '$rootScope', '$state', '$localStorage', '$upload',
+	function($scope, $modal, $log, AppRoute, $rootScope, $state, $localStorage, $upload) {
 
 		$scope.minDate = new Date;
 		$scope.newTaskName = "";
 		$scope.newSubtaskName = "";
 		$scope.showComplitedTasks = false;
-		$scope.currentTaskNumber = null;
-		$scope.rooms = $rootScope.user.lists.map(function(el) {
-			return el._id;
-		}).concat($rootScope.user.inbox.map(function(el) {
-			return el._id;
-		}));
-
-		io.emit('listRooms', $scope.rooms);
-		io.emit('userRooms', $rootScope.user.email);
-
-		if ($stateParams.listId) {
-			$scope.currentListNumber = (function(){
-				for (var i = 0; i < $rootScope.user.lists.length; i++) {
-					if ($rootScope.user.lists[i]._id == $stateParams.listId) return i;
-				}
-				return 0;
-			})();
-		} else {
-			$scope.currentListNumber = 0;
-		}
-
+		
 		$scope.$watch('files', function () {
         	$scope.upload($scope.files);
     	});
@@ -119,31 +95,31 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
                 	var file = files[i];
                 	$upload.upload({
                     	url: '/upload',
-                    	fields: {'taskId': $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id},
+                    	fields: {'taskId': $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]._id},
                     	file: file
                 	}).progress(function (evt) {
                     	var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
                     	console.log('progress: ' + progressPercentage + '% ' + evt.config.file.name);
                 	}).success(function (data, status, headers, config) {
-                		$rootScope.user.lists[$scope.currentListNumber]=data;
+                		$rootScope.user.lists[$rootScope.currentListNumber]=data;
                     	console.log('file ' + config.file.name + 'uploaded. Response: ' + data);
-                    	io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+                    	io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
                 	});
             	}
         	}
     	};
 
 		$scope.addActiveClass = function(index) {
-			return index==$scope.currentListNumber ? true : false;
+			return index==$rootScope.currentListNumber ? true : false;
 		};
 
 		$scope.addTask = function() {
-			if($scope.newTaskName && $rootScope.user.lists[$scope.currentListNumber]) {
+			if($scope.newTaskName && $rootScope.user.lists[$rootScope.currentListNumber]) {
 
-				AppRoute.createTask({ listId: $rootScope.user.lists[$scope.currentListNumber]._id, taskName: $scope.newTaskName })
+				AppRoute.createTask({ listId: $rootScope.user.lists[$rootScope.currentListNumber]._id, taskName: $scope.newTaskName })
 					.success(function(resData) {
-                		$rootScope.user.lists[$scope.currentListNumber].tasks.push(resData);
-                		io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);             	
+                		$rootScope.user.lists[$rootScope.currentListNumber].tasks.push(resData);
+                		io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);             	
             	});
 
 				$scope.newTaskName="";
@@ -151,7 +127,11 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 		};
 
 		$scope.changeActiveList = function(index) {
-			$state.go('app', { listId: $rootScope.user.lists[index]._id });
+			if (index!=$rootScope.currentListNumber) {
+				$rootScope.currentTaskNumber = null;
+				$rootScope.currentListNumber = index;
+				$state.go('app', { listId: $rootScope.user.lists[index]._id });
+			}
 		};
 
 		$scope.addList = function () {
@@ -165,9 +145,13 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 				AppRoute.createList({ listName: newListName, ownerId: $rootScope.user._id, ownerEmail: $rootScope.user.email })
 					.success(function(resData) {
+						$rootScope.rooms.push(resData._id);
                 		$rootScope.user.lists.push(resData);
-                		io.emit('userRooms', $rootScope.user.lists[$scope.currentListNumber]._id);
+                		io.emit('userRooms', resData._id);
+                		$rootScope.currentListNumber=$rootScope.user.lists.length-1;
+                		$rootScope.currentTaskNumber = null;
                 		if($rootScope.user.lists.length===1) $state.go('app', { listId: $rootScope.user.lists[0]._id });
+                		else $state.go('app', { listId: resData._id });
             	});
 
 			}, function () {
@@ -220,12 +204,18 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 				AppRoute.removeList({ listId: $rootScope.user.lists[index]._id })
 					.success(function(resData) {
 						io.emit('update', $rootScope.user.lists[index]._id);
-                		if ($scope.currentListNumber==$rootScope.user.lists.length-1) {
-                			if ($rootScope.user.lists.length==1) $scope.currentListNumber=0;
-                			else $scope.currentListNumber--;
+						io.emit('leaveListRoom', $rootScope.user.lists[index]._id);
+                		if ($rootScope.currentListNumber==$rootScope.user.lists.length-1) {
+                			if ($rootScope.user.lists.length==1) $rootScope.currentListNumber=0;
+                			else $rootScope.currentListNumber--;
                 		};
                 		$rootScope.user.lists.splice(index, 1);
-                		$scope.currentTaskNumber = null;
+                		$rootScope.currentTaskNumber = null;
+                		$rootScope.rooms = $rootScope.user.lists.map(function(el) {
+							return el._id;
+						}).concat($rootScope.user.inbox.map(function(el) {
+							return el._id;
+						}));
             	});
 
 			}, function () {
@@ -235,7 +225,7 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 		};
 
 		$scope.showTaskConfiguration = function (index) {
-			return index===$scope.currentTaskNumber ? true : false;
+			return index===$rootScope.currentTaskNumber ? true : false;
 		};
 
 		$scope.menuOptions = function (index) {
@@ -287,10 +277,10 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 		}
 
 		$scope.changeTaskStatus = function (index) {
-			AppRoute.changeTaskStatus({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[index]._id, currentTaskStatus: $rootScope.user.lists[$scope.currentListNumber].tasks[index].complited })
+			AppRoute.changeTaskStatus({ taskId: $rootScope.user.lists[$rootScope.currentListNumber].tasks[index]._id, currentTaskStatus: $rootScope.user.lists[$rootScope.currentListNumber].tasks[index].complited })
 				.success(function() {
-         			$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited=!$rootScope.user.lists[$scope.currentListNumber].tasks[index].complited;
-         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+         			$rootScope.user.lists[$rootScope.currentListNumber].tasks[index].complited=!$rootScope.user.lists[$rootScope.currentListNumber].tasks[index].complited;
+         			io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
             });
 		};
 
@@ -320,11 +310,17 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 				AppRoute.leaveList({ userEmail: $rootScope.user.email, listId: $rootScope.user.lists[index]._id })
 					.success(function() {
 						io.emit('update', $rootScope.user.lists[index]._id);
-                		if ($scope.currentListNumber==$rootScope.user.lists.length-1) {
-                			if ($rootScope.user.lists.length==1) $scope.currentListNumber=0;
-                			else $scope.currentListNumber--;
+						io.emit('leaveListRoom', $rootScope.user.lists[index]._id);
+                		if ($rootScope.currentListNumber==$rootScope.user.lists.length-1) {
+                			if ($rootScope.user.lists.length==1) $rootScope.currentListNumber=0;
+                			else $rootScope.currentListNumber--;
                 		};
-                		$rootScope.user.lists.splice(index, 1);      		 
+                		$rootScope.user.lists.splice(index, 1);
+                		$rootScope.rooms = $rootScope.user.lists.map(function(el) {
+							return el._id;
+						}).concat($rootScope.user.inbox.map(function(el) {
+							return el._id;
+						}));
             	});
 
 			}, function () {
@@ -350,27 +346,9 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 		}
 
 		$scope.endSession = function () {
+			$rootScope.pageNotReloaded=true;
 			$localStorage.user=null;
 			$state.go('home');
-		}
-
-		$scope.accountSync = function () {
-			AppRoute.getUser({ userId: $rootScope.user._id })
-				.success(function(resData) {
-					$localStorage.user = resData;
-					$rootScope.user = $localStorage.user;
-					if (!$rootScope.user.lists[$scope.currentListNumber]) {
-						if($rootScope.user.lists.length) $state.go('app', { listId: $rootScope.user.lists[0]._id });
-						else $state.go('app');
-					}
-					$scope.rooms = $rootScope.user.inbox.map(function(el) {
-						return el._id;
-					});
-
-					if (!$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]) $scope.currentTaskNumber=null;
-
-					if($rootScope.user.inbox.length) io.emit('listRooms', $scope.rooms);
-                });
 		}
 
 		$scope.confirmInboxList = function (inboxList) {
@@ -388,10 +366,17 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 		$scope.rejectInboxList = function (inboxList) {
 			AppRoute.rejectInboxList({ userEmail: $rootScope.user.email, listId: inboxList._id })
 				.success(function() {
+					io.emit('leaveListRoom', inboxList._id);
 					io.emit('update', inboxList._id);
 					$rootScope.user.inbox=$rootScope.user.inbox.filter(function(el) {
 						if (el._id!=inboxList._id) return el;
 					});
+
+					$rootScope.rooms = $rootScope.user.lists.map(function(el) {
+						return el._id;
+					}).concat($rootScope.user.inbox.map(function(el) {
+						return el._id;
+					}));
                 });
 		}
 
@@ -406,28 +391,28 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 		};
 
 		$scope.updateDate = function () {
-			if (!$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].deadline) $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].deadline="";
-			AppRoute.updateDate( { taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, newDate: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].deadline } )
+			if (!$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].deadline) $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].deadline="";
+			AppRoute.updateDate( { taskId: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]._id, newDate: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].deadline } )
 				.success(function() {
-					io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+					io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
             	});
 		}
 
 		$scope.updateDescription = function () {
-			if(!$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].description) $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].description="";
-			AppRoute.updateDescription( { taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, newDescription: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].description } )
+			if(!$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].description) $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].description="";
+			AppRoute.updateDescription( { taskId: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]._id, newDescription: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].description } )
 				.success(function() {
-					io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+					io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
             	});
 		}
 
 		$scope.addSubtask = function() {
 			if($scope.newSubtaskName) {
 
-				AppRoute.createSubtask({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, subtaskName: $scope.newSubtaskName })
+				AppRoute.createSubtask({ taskId: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]._id, subtaskName: $scope.newSubtaskName })
 					.success(function(resData) {
-                		$rootScope.user.lists[$scope.currentListNumber]=resData;
-                		io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);             	
+                		$rootScope.user.lists[$rootScope.currentListNumber]=resData;
+                		io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);             	
             	});
 
 				$scope.newSubtaskName="";
@@ -436,20 +421,20 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 		$scope.changeSubtaskStatus = function(index) {
 
-			var subtasks = $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].subtasks;
+			var subtasks = $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].subtasks;
 			subtasks[index].complited=!subtasks[index].complited;
 
-			AppRoute.changeSubtask({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, subtasks: subtasks })
+			AppRoute.changeSubtask({ taskId: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]._id, subtasks: subtasks })
 				.success(function() {
-         			$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].subtasks[index].complited=subtasks[index].complited;
-         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+         			$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].subtasks[index].complited=subtasks[index].complited;
+         			io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
             });
 		}
 
 		$scope.changeSubtask = function (index) {
-			AppRoute.changeSubtask({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, subtasks: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].subtasks })
+			AppRoute.changeSubtask({ taskId: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]._id, subtasks: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].subtasks })
 				.success(function() {
-         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+         			io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
             });
 		}
 
@@ -467,10 +452,10 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 			modalInstance.result.then(function () {
 
-				AppRoute.removeFile({ taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id, file: file })
+				AppRoute.removeFile({ taskId: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]._id, file: file })
 				.success(function() {
-					$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].attachments.splice(index, 1);
-         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+					$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].attachments.splice(index, 1);
+         			io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
             });
 
 			}, function () {
@@ -489,10 +474,10 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 			modalInstance.result.then(function () {
 
-				AppRoute.removeSubtask({ subtask: subtask, taskId: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber]._id })
+				AppRoute.removeSubtask({ subtask: subtask, taskId: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]._id })
 				.success(function() {
-					$rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber].subtasks.splice(index, 1);
-         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+					$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].subtasks.splice(index, 1);
+         			io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
             });
 
 			}, function () {
@@ -511,11 +496,11 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', '$stateParam
 
 			modalInstance.result.then(function () {
 
-				AppRoute.removeTask({ task: $rootScope.user.lists[$scope.currentListNumber].tasks[$scope.currentTaskNumber] })
+				AppRoute.removeTask({ task: $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber] })
 				.success(function() {
-					$rootScope.user.lists[$scope.currentListNumber].tasks.splice($scope.currentTaskNumber, 1);
-					$scope.currentTaskNumber=null;
-         			io.emit('update', $rootScope.user.lists[$scope.currentListNumber]._id);
+					$rootScope.user.lists[$rootScope.currentListNumber].tasks.splice($rootScope.currentTaskNumber, 1);
+					$rootScope.currentTaskNumber=null;
+         			io.emit('update', $rootScope.user.lists[$rootScope.currentListNumber]._id);
             });
 
 			}, function () {
@@ -582,7 +567,7 @@ magicListcontrollers.controller('removeListCtrl', ['$scope', '$rootScope', '$mod
 magicListcontrollers.controller('changeListMembersCtrl', ['$scope', '$modalInstance', '$rootScope', 'index', 'AppRoute',
 	function ($scope, $modalInstance, $rootScope, index, AppRoute) {
 
-	$scope.listMembers = $rootScope.user.lists[index].membersEmail;
+	$scope.index=index;
 	$scope.newMemberEmail="";
 	$scope.userIsNotExist=false;
 	$scope.userIsAlreadyInList=false;
@@ -618,7 +603,6 @@ magicListcontrollers.controller('changeListMembersCtrl', ['$scope', '$modalInsta
         		$rootScope.user.lists[index].membersEmail=$rootScope.user.lists[index].membersEmail.filter(function(el) {
 					if (el!=userEmail) return el;
 				});
-				$scope.listMembers = $rootScope.user.lists[index].membersEmail;
 				$rootScope.user.lists[index].members=$rootScope.user.lists[index].members.filter(function(el) {
 					if (el!=data) return el;
 				});

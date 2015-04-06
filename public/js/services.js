@@ -111,8 +111,79 @@ AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope',
                 		event.preventDefault();
                 		$state.go('home');
                 	});
-			} else if ($localStorage.user) {
+			} else if (fromState.name!='app' && $localStorage.user) {
+
+				if (!$rootScope.pageNotReloaded) io.on('updateUser', function() {
+    				$rootScope.accountSync();
+				});
+
 				$rootScope.user = $localStorage.user;
+				$rootScope.rooms = $rootScope.user.lists.map(function(el) {
+					return el._id;
+				}).concat($rootScope.user.inbox.map(function(el) {
+					return el._id;
+				}));
+
+				$rootScope.currentTaskNumber = null;
+
+				if (toParams.listId) {
+					$rootScope.currentListNumber = (function(){
+						for (var i = 0; i < $rootScope.user.lists.length; i++) {
+							if ($rootScope.user.lists[i]._id == toParams.listId) return i;
+						}
+					return 0;
+					})();
+				} else {
+					$rootScope.currentListNumber = 0;
+				}
+
+				$rootScope.accountSync = function () {
+					AppRoute.getUser({ userId: $rootScope.user._id })
+					.success(function(resData) {
+
+						var previousRooms = $rootScope.rooms;
+						$localStorage.user = resData;
+						$rootScope.user = $localStorage.user;
+						var newRooms = $rootScope.user.lists.map(function(el) {
+							return el._id;
+						}).concat($rootScope.user.inbox.map(function(el) {
+							return el._id;
+						}));
+
+						for (var i = 0; i < previousRooms.length; i++) {
+							var bp = false;
+							for (var j = 0; j < newRooms.length; j++) {
+								if(previousRooms[i]===newRooms[j]) {
+									bp = true;
+									newRooms.splice(j, 1)
+									break;
+								}
+							};
+							if(!bp) io.emit('leaveListRoom', previousRooms[i]);
+						};
+
+						if(newRooms.length) io.emit('listRooms', newRooms);
+
+						$rootScope.rooms = $rootScope.user.lists.map(function(el) {
+							return el._id;
+						}).concat($rootScope.user.inbox.map(function(el) {
+							return el._id;
+						}));
+
+						if (!$rootScope.user.lists[$rootScope.currentListNumber]) {
+							
+							$rootScope.currentTaskNumber = null;
+							$rootScope.currentListNumber=0;
+							if($rootScope.user.lists.length) $state.go('app', { listId: $rootScope.user.lists[0]._id });
+							else $state.go('app');
+						}
+
+						if (!$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]) $rootScope.currentTaskNumber=null;
+						});
+				}
+
+				io.emit('listRooms', $rootScope.rooms);
+				io.emit('userRooms', $rootScope.user.email);
 			}
         };
 
