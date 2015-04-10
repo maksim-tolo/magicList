@@ -10,7 +10,8 @@ var magicListApp = angular.module('magicListApp', [
   'ui.bootstrap.dropdown',
   'magicListDirectives',
   'ui.bootstrap.datepicker',
-  'angularFileUpload'
+  'angularFileUpload',
+  'magicListFilters'
   ]);
 
 magicListApp.config(['$stateProvider', '$urlRouterProvider',

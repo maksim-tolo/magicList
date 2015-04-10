@@ -509,6 +509,19 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', 'AppRoute', 
 
 		}
 
+		$scope.changeBackground = function() {
+
+			var modalInstance = $modal.open({
+      		templateUrl: 'changeBackground.html',
+      		controller: 'changeBackgroundCtrl'
+    		});
+
+			modalInstance.result.then(null, function () {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+
+		}
+
 }]);
 
 magicListcontrollers.controller('addListCtrl', ['$scope', '$modalInstance',
@@ -626,4 +639,20 @@ magicListcontrollers.controller('leaveListCtrl', ['$scope', '$rootScope', '$moda
 	$scope.cancel = function () {
 		$modalInstance.dismiss('cancel');
 	};
+}]);
+
+magicListcontrollers.controller('changeBackgroundCtrl', ['$scope', '$modalInstance', '$rootScope', 'AppRoute',
+	function ($scope, $modalInstance, $rootScope, AppRoute) {
+
+	$scope.applyBackground = function(newBackground) {
+		AppRoute.changeBackground({userId: $rootScope.user._id, newBackground: newBackground})
+		.success(function() {
+			$rootScope.user.background = newBackground;
+		})
+	}
+
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+
 }]);

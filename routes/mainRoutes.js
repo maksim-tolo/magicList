@@ -6,10 +6,6 @@ router.get('/', function(req, res) {
     res.sendfile('./public/index.html');
 });
 
-router.get('/css/background', function(req, res) {
-    res.sendfile('./public/img/background.jpg');
-});
-
 router.post('/signup', passport.authenticate('local-signup'), function(req, res) {
     res.send(req.user);
 });

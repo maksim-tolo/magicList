@@ -6,6 +6,7 @@ var userSchema = new mongoose.Schema({
 	lastName: String,
 	email: String,
 	password: String,
+	background: String,
 	lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'List' }],
 	inbox: [{ type: mongoose.Schema.Types.ObjectId, ref: 'List' }]
 });

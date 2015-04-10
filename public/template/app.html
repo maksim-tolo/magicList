@@ -79,6 +79,41 @@
 	</form>
 </script>
 
+<script type="text/ng-template" id="changeBackground.html">
+	<div class="modal-body">
+		<div class="changeBackground">
+			<div>
+				<div>
+					<img src="img/background_1.jpg" ng-click="applyBackground('background_1.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_1.jpg' }"></i>
+				</div>
+				<div>
+					<img src="img/background_2.jpg" ng-click="applyBackground('background_2.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_2.jpg' }"></i>
+				</div>
+				<div>
+					<img src="img/background_3.jpg" ng-click="applyBackground('background_3.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_3.jpg' }"></i>
+				</div>
+			</div>
+			<div>
+				<div>
+					<img src="img/background_4.jpg" ng-click="applyBackground('background_4.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_4.jpg' }"></i>
+				</div>
+				<div>
+					<img src="img/background_5.jpg" ng-click="applyBackground('background_5.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_5.jpg' }"></i>
+				</div>
+				<div>
+					<img src="img/background_6.jpg" ng-click="applyBackground('background_6.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_6.jpg' }"></i>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
 <script type="text/ng-template" id="changeListMembers.html">
 	<form name="addMembersForm" novalidate>
 		<div class="modal-header">
@@ -118,6 +153,8 @@
 					<li ng-click="accountSync()">Синхронизировать сейчас</li>
 					<li>{{user.email}}</li>
 					<li class="divider"></li>
+					<li ng-click="changeBackground()">Сменить фон</li>
+					<li class="divider"></li>
 					<li ng-click="endSession()">Выйти</li>
 				</ul>
 			</div>
@@ -148,20 +185,21 @@
 	</div>
 
 	<main id="main">
+		<img ng-src="{{'img/' + user.background}}">
 		<div ng-class="{ 'mainWidthTaskProperties': currentTaskNumber!==null }">
 			<div>
 				<input class="addTask" type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
 			</div>
 			<ul class="tasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.$parent.currentTaskNumber=$index" ng-show="!task.complited">
-					<i class="icon-radio-unchecked" ng-click="$parent.changeTaskStatus($index)"></i>
+				<li ng-repeat="task in user.lists[currentListNumber].tasks | reverse" ng-right-click="$parent.$parent.currentTaskNumber=user.lists[currentListNumber].tasks.length - 1 - $index" ng-show="!task.complited">
+					<i class="icon-radio-unchecked" ng-click="$parent.changeTaskStatus(user.lists[currentListNumber].tasks.length - 1 - $index)"></i>
 					<div>{{task.taskName}}</div>
 				</li>
 			</ul>
 			<div class="showComplitedTasksButton" ng-click="showComplitedTasks=!showComplitedTasks" ng-show="calcNumberOfActiveTasks(user.lists[currentListNumber])!=user.lists[currentListNumber].tasks.length">Показать завершённые задачи</div>
 			<ul class="tasks complitedTasks" ng-show="showComplitedTasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks" ng-right-click="$parent.$parent.currentTaskNumber=$index" ng-show="task.complited">
-					<i class="icon-circle-check" ng-click="$parent.changeTaskStatus($index)"></i>
+				<li ng-repeat="task in user.lists[currentListNumber].tasks | reverse" ng-right-click="$parent.$parent.currentTaskNumber=user.lists[currentListNumber].tasks.length - 1 - $index" ng-show="task.complited">
+					<i class="icon-circle-check" ng-click="$parent.changeTaskStatus(user.lists[currentListNumber].tasks.length - 1 - $index)"></i>
 					<div>{{task.taskName}}</div>
 				</li>
 			</ul>

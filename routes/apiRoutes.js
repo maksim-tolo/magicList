@@ -40,4 +40,6 @@ router.post('/removeTask', apiController.removeTask);
 
 router.post('/removeSubtask', apiController.removeSubtask);
 
+router.post('/changeBackground', apiController.changeBackground);
+
 module.exports = router;

@@ -64,10 +64,11 @@ module.exports = function(passport) {
             } else {
 
                 var newUser = new User();
-                newUser.email    = email;
+                newUser.email = email;
                 newUser.password = newUser.generateHash(password);
                 newUser.firstName = req.body.firstName;
                 newUser.lastName = req.body.lastName;
+                newUser.background = "background_1.jpg";
 
                 newUser.save(function(err) {
                     if (err)

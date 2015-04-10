@@ -87,6 +87,10 @@ AppService.factory('AppRoute', ['$http',
 
 			removeSubtask : function (data) {
 				return $http.post('/api/removeSubtask', data);
+			},
+
+			changeBackground : function (data) {
+				return $http.post('/api/changeBackground', data);
 			}
 
 		}       
@@ -171,19 +175,32 @@ AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope',
 						}));
 
 						if (!$rootScope.user.lists[$rootScope.currentListNumber]) {
-							
+
 							$rootScope.currentTaskNumber = null;
 							$rootScope.currentListNumber=0;
 							if($rootScope.user.lists.length) $state.go('app', { listId: $rootScope.user.lists[0]._id });
 							else $state.go('app');
 						}
 
-						if (!$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]) $rootScope.currentTaskNumber=null;
+						else if (!$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber]) $rootScope.currentTaskNumber=null;
 						});
 				}
 
 				io.emit('listRooms', $rootScope.rooms);
 				io.emit('userRooms', $rootScope.user.email);
+			} else if (fromState.name=='app' && toState.name=='app' && toParams.listId!=fromParams.listId && $localStorage.user) {
+				$rootScope.currentTaskNumber = null;
+
+				if (toParams.listId) {
+					$rootScope.currentListNumber = (function(){
+						for (var i = 0; i < $rootScope.user.lists.length; i++) {
+							if ($rootScope.user.lists[i]._id == toParams.listId) return i;
+						}
+					return 0;
+					})();
+				} else {
+					$rootScope.currentListNumber = 0;
+				}
 			}
         };
 

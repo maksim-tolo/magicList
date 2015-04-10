@@ -74,8 +74,12 @@ body {
 	bottom: 0;
 	left: 270px;
 	right: 0;
-	background-image: url(background);
 	z-index: 1;
+}
+#main > img {
+	position: fixed;
+	top: 0;
+	left: 270px;
 }
 #main > div {
 	margin: 0 10px;
@@ -467,4 +471,22 @@ body {
 	cursor: pointer;
 	font-size: 20px;
 	border: none;
+}
+.changeBackground img {
+	width: 170px;
+	height: 170px;
+	margin: 5px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+.changeBackground i {
+	font-size: 30px;
+	position: absolute;
+	right: 0px;
+	color: #05C800;
+}
+.changeBackground > div > div {
+	position: relative;
+	display: inline-block;
+	margin-left: 3px;
 }

@@ -155,15 +155,17 @@ apiController.removeUserFromList = function (req, res) {
 apiController.updateDate = function (req, res) {
     List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.deadline': req.body.newDate }}, function(err){
         if (err) return console.error(err);
-        res.end();
     });   
+
+    res.end();
 };
 
 apiController.updateDescription = function (req, res) {
     List.update({ 'tasks._id': req.body.taskId }, {'$set': { 'tasks.$.description': req.body.newDescription }}, function(err){
         if (err) return console.error(err);
-        res.end();
     });   
+
+    res.end();
 };
 
 apiController.createSubtask = function (req, res) {
@@ -193,8 +195,9 @@ apiController.removeFile = function (req, res) {
     });
     List.update({ 'tasks._id': req.body.taskId }, { $pull: {'tasks.$.attachments': req.body.file } }, function(err){
         if (err) return console.error(err);
-        res.end();
     });
+
+    res.end();
 };
 
 apiController.removeTask = function (req, res) {
@@ -215,15 +218,25 @@ apiController.removeTask = function (req, res) {
 
     List.update({ 'tasks._id': req.body.task._id }, { $pull: {'tasks': req.body.task } }, function(err){
         if (err) return console.error(err);
-        res.end();
     });
+
+    res.end();
 };
 
 apiController.removeSubtask = function (req, res) {
     List.update({ 'tasks._id': req.body.taskId }, { $pull: {'tasks.$.subtasks': req.body.subtask } }, function(err){
         if (err) return console.error(err);
-        res.end();
     });
+
+    res.end();
+};
+
+apiController.changeBackground = function (req, res) {
+    User.findByIdAndUpdate(req.body.userId, { background: req.body.newBackground }, function(err){
+        if (err) return console.error(err);
+    });
+
+    res.end();
 };
 
 module.exports = apiController;
