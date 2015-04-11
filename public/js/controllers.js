@@ -1,7 +1,7 @@
 var magicListcontrollers = angular.module('magicListcontrollers', []);
 
-magicListcontrollers.controller('home', ['$scope', 'AppRoute', '$state', '$localStorage', '$rootScope', '$window',
-	function($scope, AppRoute, $state, $localStorage, $rootScope, $window) {
+magicListcontrollers.controller('home', ['$scope', 'AppRoute', '$state', '$localStorage', '$rootScope', '$translate',
+	function($scope, AppRoute, $state, $localStorage, $rootScope, $translate) {
 		$scope.user = {
 			email: "",
 			password: ""
@@ -11,6 +11,11 @@ magicListcontrollers.controller('home', ['$scope', 'AppRoute', '$state', '$local
 		$scope.passwordIsEmpty=false;
 		$scope.userIsNotExist=false;
 		$scope.showNavbar=false;
+
+		$scope.changeLanguage = function (langKey) {
+    		$translate.use(langKey);
+    		$localStorage.lang=langKey;
+  		};
 
 		$scope.submitForm = function() {
 			AppRoute.login($scope.user)
@@ -84,6 +89,8 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', 'AppRoute', 
 		$scope.newTaskName = "";
 		$scope.newSubtaskName = "";
 		$scope.showComplitedTasks = false;
+		$scope.userIsNotStateInList = false;
+		$scope.assignToNewUser = "";
 		
 		$scope.$watch('files', function () {
         	$scope.upload($scope.files);
@@ -231,23 +238,23 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', 'AppRoute', 
 		$scope.menuOptions = function (index) {
 
 			var action = $scope.addListMembers;
-			var actionName = 'Добавить участников';
+			var actionName = $rootScope.addListMembersTranslation;
 			var action2 = $scope.leaveList;
-			var action2Name = 'Покинуть';
+			var action2Name = $rootScope.leaveListTranslation;
 
 			if($rootScope.user.lists[index].owner==$rootScope.user._id) {
-				actionName = 'Изменить участников';
-				action2Name = 'Удалить';
+				actionName = $rootScope.changeListMembersTranslation;
+				action2Name = $rootScope.deleteTranslation;
 				action = $scope.changeListMembers;
 				action2 = $scope.removeList;			
 			};
 
 			return [
 				[$rootScope.user.lists[index].listName, function () {
-        		$scope.changeActiveList(index);
+        			$scope.changeActiveList(index);
     			}],
     			null,
-    			['Переименовать', function () {
+    			[$rootScope.renameListTranslation, function () {
         			$scope.renameList(index);
     			}],
     			[actionName, function () {
@@ -439,7 +446,7 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', 'AppRoute', 
 		}
 
 		$scope.checkAttachments = function (el) {
-			return el.extension == ('jpg'||'png'||'jpeg') ? true : false;
+			return el.extension == 'png'|| el.extension=='gif'|| el.extension == 'jpg'|| el.extension == 'jpeg' ? true : false;
 		}
 
 		$scope.removeFile = function (file, index, size) {
@@ -520,6 +527,24 @@ magicListcontrollers.controller('app', ['$scope', '$modal', '$log', 'AppRoute', 
 				$log.info('Modal dismissed at: ' + new Date());
 			});
 
+		}
+
+		$scope.assignToUser = function() {
+			for (var i = 0; i < $rootScope.user.lists[$rootScope.currentListNumber].membersEmail.length; i++) {
+				if ($rootScope.user.lists[$rootScope.currentListNumber].membersEmail[i]==$scope.assignToNewUser) {
+					$rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].assignTo = $scope.assignToNewUser;
+					$scope.userIsNotStateInList = false;
+					return;
+				};
+			}
+
+			$scope.userIsNotStateInList = true;
+			$scope.assignToNewUser = $rootScope.user.lists[$rootScope.currentListNumber].tasks[$rootScope.currentTaskNumber].assignTo;
+		}
+
+		$scope.showTaskProperty = function(task, index) {
+			$rootScope.currentTaskNumber=$rootScope.user.lists[$rootScope.currentListNumber].tasks.length - 1 - index;
+			$scope.assignToNewUser=task.assignTo;
 		}
 
 }]);

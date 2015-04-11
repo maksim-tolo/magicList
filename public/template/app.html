@@ -1,67 +1,67 @@
 <script type="text/ng-template" id="addList.html">
 	<div class="modal-header">
-		<h3 class="modal-title">Создать новый список</h3>
+		<h3 class="modal-title" translate>app.modal.addList</h3>
 	</div>
 	<div class="modal-body">
-		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" ng-keyup="$event.keyCode == 13 && newListName && save()" autofocus></input>
+		<input type="text" placeholder="{{'app.modal.listName' | translate}}" ng-model="newListName" class="newListName" ng-keyup="$event.keyCode == 13 && newListName && save()" autofocus></input>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-primary" ng-click="save()" ng-disabled="!newListName">Сохранить</button>
-		<button class="btn btn-danger" ng-click="cancel()">Отмена</button>
+		<button class="btn btn-primary" ng-click="save()" ng-disabled="!newListName" translate>app.modal.save</button>
+		<button class="btn btn-danger" ng-click="cancel()" translate>app.modal.cancel</button>
 	</div>
 </script>
 
 <script type="text/ng-template" id="renameList.html">
 	<div class="modal-header">
-		<h3 class="modal-title">Переименовать</h3>
+		<h3 class="modal-title" translate>app.modal.renameList</h3>
 	</div>
 	<div class="modal-body">
-		<input type="text" placeholder="Название" ng-model="newListName" class="newListName" ng-keyup="$event.keyCode == 13 && newListName && save()" autofocus></input>
+		<input type="text" placeholder="{{'app.modal.listName' | translate}}" ng-model="newListName" class="newListName" ng-keyup="$event.keyCode == 13 && newListName && save()" autofocus></input>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-primary" ng-click="save()" ng-disabled="!newListName">Сохранить</button>
-		<button class="btn btn-danger" ng-click="cancel()">Отмена</button>
+		<button class="btn btn-primary" ng-click="save()" ng-disabled="!newListName" translate>app.modal.save</button>
+		<button class="btn btn-danger" ng-click="cancel()" translate>app.modal.cancel</button>
 	</div>
 </script>
 
 <script type="text/ng-template" id="removeList.html">
 	<div class="modal-body">
-		<h4 class="modal-title modalTitle">{{listName}} будет удалён навсегда</h4>
+		<h4 class="modal-title modalTitle">{{listName}} {{'app.modal.removeList' | translate}}</h4>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-danger" ng-click="save()">Удалить список</button>
-		<button class="btn btn-primary" ng-click="cancel()">Отмена</button>
+		<button class="btn btn-danger" ng-click="save()" translate>app.modal.removeListButton</button>
+		<button class="btn btn-primary" ng-click="cancel()" translate>app.modal.cancel</button>
 	</div>
 </script>
 
 <script type="text/ng-template" id="leaveList.html">
 	<div class="modal-body">
-		<h4 class="modal-title modalTitle">Вы действительно хотите покинуть список {{listName}}?</h4>
+		<h4 class="modal-title modalTitle">{{'app.modal.leaveList' | translate}} {{listName}}?</h4>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-danger" ng-click="save()">Покинуть список</button>
-		<button class="btn btn-primary" ng-click="cancel()">Отмена</button>
+		<button class="btn btn-danger" ng-click="save()" translate>app.modal.leaveListButton</button>
+		<button class="btn btn-primary" ng-click="cancel()" translate>app.modal.cancel</button>
 	</div>
 </script>
 
 <script type="text/ng-template" id="delete.html">
 	<div class="modal-body">
-		<h4 class="modal-title modalTitle">Поддтвердите удаление</h4>
+		<h4 class="modal-title modalTitle" translate>app.modal.delete</h4>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-danger" ng-click="save()">Удалить</button>
-		<button class="btn btn-primary" ng-click="cancel()">Отмена</button>
+		<button class="btn btn-danger" ng-click="save()" translate>app.modal.deleteButton</button>
+		<button class="btn btn-primary" ng-click="cancel()" translate>app.modal.cancel</button>
 	</div>
 </script>
 
 <script type="text/ng-template" id="addListMembers.html">
 	<form name="addMembersForm" novalidate>
 		<div class="modal-header">
-			<h3 class="modal-title membersListTitle">Добавить участников</h3>
+			<h3 class="modal-title membersListTitle" translate>app.modal.addListMembers</h3>
 			<div class="form-group" ng-class="{ 'has-error' : userIsAlreadyInList || userIsNotExist }">
-				<input type="email" name="email" class="form-control" placeholder="Введите email нового участника" ng-model="newMemberEmail" ng-change="userIsNotExist=false; userIsAlreadyInList=false" autofocus></input>
-				<p ng-show="userIsNotExist" class="help-block">Пользователя с данным email не существует.</p>
-				<p ng-show="userIsAlreadyInList" class="help-block">Пользователь уже является участником списка.</p>
+				<input type="email" name="email" class="form-control" placeholder="{{'app.modal.addListMembersPlaceholder' | translate}}" ng-model="newMemberEmail" ng-change="userIsNotExist=false; userIsAlreadyInList=false" autofocus></input>
+				<p ng-show="userIsNotExist" class="help-block" translate>app.modal.userIsNotExist</p>
+				<p ng-show="userIsAlreadyInList" class="help-block" translate>app.modal.userIsAlreadyInList</p>
 			</div>
 		</div>
 		<div class="modal-body">
@@ -73,8 +73,8 @@
 			</ul>
 		</div>
 		<div class="modal-footer membersListFooter">
-			<button class="btn btn-primary" ng-disabled="!newMemberEmail" ng-click="addMember()">Добавить</button>
-			<button class="btn btn-primary" ng-click="cancel()">Готово</button>
+			<button class="btn btn-primary" ng-disabled="!newMemberEmail" ng-click="addMember()" translate>app.modal.add</button>
+			<button class="btn btn-primary" ng-click="cancel()" translate>app.modal.done</button>
 		</div>
 	</form>
 </script>
@@ -110,6 +110,20 @@
 					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_6.jpg' }"></i>
 				</div>
 			</div>
+			<div>
+				<div>
+					<img src="img/background_7.jpg" ng-click="applyBackground('background_7.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_7.jpg' }"></i>
+				</div>
+				<div>
+					<img src="img/background_8.jpg" ng-click="applyBackground('background_8.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_8.jpg' }"></i>
+				</div>
+				<div>
+					<img src="img/background_9.jpg" ng-click="applyBackground('background_9.jpg')">
+					<i ng-class="{ 'glyphicon glyphicon-ok': user.background=='background_9.jpg' }"></i>
+				</div>
+			</div>
 		</div>
 	</div>
 </script>
@@ -117,11 +131,11 @@
 <script type="text/ng-template" id="changeListMembers.html">
 	<form name="addMembersForm" novalidate>
 		<div class="modal-header">
-			<h3 class="modal-title membersListTitle">Изменить участников</h3>
+			<h3 class="modal-title membersListTitle" translate>app.modal.changeListMembers</h3>
 			<div class="form-group" ng-class="{ 'has-error' : userIsAlreadyInList || userIsNotExist }">
-				<input type="email" name="email" class="form-control" placeholder="Введите email нового участника" ng-model="newMemberEmail" ng-change="userIsNotExist=false; userIsAlreadyInList=false" autofocus></input>
-				<p ng-show="userIsNotExist" class="help-block">Пользователя с данным email не существует.</p>
-				<p ng-show="userIsAlreadyInList" class="help-block">Пользователь уже является участником списка.</p>
+				<input type="email" name="email" class="form-control" placeholder="{{'app.modal.addListMembersPlaceholder' | translate}}" ng-model="newMemberEmail" ng-change="userIsNotExist=false; userIsAlreadyInList=false" autofocus></input>
+				<p ng-show="userIsNotExist" class="help-block" translate>app.modal.userIsNotExist</p>
+				<p ng-show="userIsAlreadyInList" class="help-block" translate>app.modal.userIsAlreadyInList</p>
 			</div>
 		</div>
 		<div class="modal-body">
@@ -134,8 +148,8 @@
 			</ul>
 		</div>
 		<div class="modal-footer membersListFooter">
-			<button class="btn btn-primary" ng-disabled="!newMemberEmail" ng-click="addMember()">Добавить</button>
-			<button class="btn btn-primary" ng-click="cancel()">Готово</button>
+			<button class="btn btn-primary" ng-disabled="!newMemberEmail" ng-click="addMember()" translate>app.modal.add</button>
+			<button class="btn btn-primary" ng-click="cancel()" translate>app.modal.done</button>
 		</div>
 	</form>
 </script>
@@ -150,12 +164,12 @@
 					{{user.firstName}} {{user.lastName}} <span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu" role="menu">
-					<li ng-click="accountSync()">Синхронизировать сейчас</li>
+					<li ng-click="accountSync()" translate>app.sidebar.accountSync</li>
 					<li>{{user.email}}</li>
+			
+					<li ng-click="changeBackground()" translate>app.sidebar.changeBackground</li>
 					<li class="divider"></li>
-					<li ng-click="changeBackground()">Сменить фон</li>
-					<li class="divider"></li>
-					<li ng-click="endSession()">Выйти</li>
+					<li ng-click="endSession()" translate>app.sidebar.endSession</li>
 				</ul>
 			</div>
 		</div>
@@ -188,17 +202,17 @@
 		<img ng-src="{{'img/' + user.background}}">
 		<div ng-class="{ 'mainWidthTaskProperties': currentTaskNumber!==null }">
 			<div>
-				<input class="addTask" type="text" placeholder="Добавьте задачу" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
+				<input class="addTask" type="text" placeholder="{{'app.addTask' | translate}}" ng-model="newTaskName" ng-keyup="$event.keyCode == 13 && addTask()"></input>
 			</div>
 			<ul class="tasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks | reverse" ng-right-click="$parent.$parent.currentTaskNumber=user.lists[currentListNumber].tasks.length - 1 - $index" ng-show="!task.complited">
+				<li ng-repeat="task in user.lists[currentListNumber].tasks | reverse" ng-right-click="showTaskProperty(task, $index)" ng-show="!task.complited">
 					<i class="icon-radio-unchecked" ng-click="$parent.changeTaskStatus(user.lists[currentListNumber].tasks.length - 1 - $index)"></i>
 					<div>{{task.taskName}}</div>
 				</li>
 			</ul>
-			<div class="showComplitedTasksButton" ng-click="showComplitedTasks=!showComplitedTasks" ng-show="calcNumberOfActiveTasks(user.lists[currentListNumber])!=user.lists[currentListNumber].tasks.length">Показать завершённые задачи</div>
+			<div class="showComplitedTasksButton" ng-click="showComplitedTasks=!showComplitedTasks" ng-show="calcNumberOfActiveTasks(user.lists[currentListNumber])!=user.lists[currentListNumber].tasks.length">{{'app.showComplitedTasks' | translate}}</div>
 			<ul class="tasks complitedTasks" ng-show="showComplitedTasks">
-				<li ng-repeat="task in user.lists[currentListNumber].tasks | reverse" ng-right-click="$parent.$parent.currentTaskNumber=user.lists[currentListNumber].tasks.length - 1 - $index" ng-show="task.complited">
+				<li ng-repeat="task in user.lists[currentListNumber].tasks | reverse" ng-right-click="showTaskProperty(task, $index)" ng-show="task.complited">
 					<i class="icon-circle-check" ng-click="$parent.changeTaskStatus(user.lists[currentListNumber].tasks.length - 1 - $index)"></i>
 					<div>{{task.taskName}}</div>
 				</li>
@@ -214,9 +228,15 @@
 			<i class="glyphicon glyphicon-remove-circle" ng-click="$parent.currentTaskNumber=null"></i>
 		</div>
 		<div class="propertiesBody">
+			<div class="assignTo" ng-show="user.lists[currentListNumber].membersEmail.length!=1">
+				<div class="form-group" ng-class="{ 'has-error' : userIsNotStateInList }">
+					<input class = "form-control" type="text" ng-model="assignToNewUser" ng-keyup="$event.keyCode == 13 && assignToUser()" ng-blur="assignToUser()">
+					<p class="help-block" ng-show="userIsNotStateInList">Пользователь не состоит в этом списке.</p>
+				</div>
+			</div>
 			<div class="datepicker">
 				<p class="input-group" ng-click="openDatepicker($event)">
-					<input ng-change="updateDate()" placeholder="Установить срок" ng-disabled="true" type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="user.lists[currentListNumber].tasks[currentTaskNumber].deadline" is-open="openedDatepicker" min-date="minDate" datepicker-options="dateOptions" ng-required="true" close-text="Закрыть" clear-text="Очистить" current-text="Сегодня">
+					<input ng-change="updateDate()" placeholder="{{'app.deadline' | translate}}" ng-disabled="true" type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="user.lists[currentListNumber].tasks[currentTaskNumber].deadline" is-open="openedDatepicker" min-date="minDate" datepicker-options="dateOptions" ng-required="true" close-text="Закрыть" clear-text="Очистить" current-text="Сегодня">
 					<span class="input-group-btn">
 						<button type="button" class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button>
 					</span>
@@ -232,17 +252,17 @@
 				</ul>
 				<div>
 					<i class="glyphicon glyphicon-plus"></i>
-					<input type="text" ng-model="newSubtaskName" ng-keyup="$event.keyCode == 13 && addSubtask()" ng-blur="addSubtask()" placeholder="Добавить подзадачу"></input>
+					<input type="text" ng-model="newSubtaskName" ng-keyup="$event.keyCode == 13 && addSubtask()" ng-blur="addSubtask()" placeholder="{{'app.addSubtask' | translate}}"></input>
 				</div>
 			</div>
 			<div class="description">
-				<textarea placeholder="Добавить описание" ng-model="user.lists[currentListNumber].tasks[currentTaskNumber].description" ng-blur="updateDescription()"></textarea>
+				<textarea placeholder="{{'app.updateDescription' | translate}}" ng-model="user.lists[currentListNumber].tasks[currentTaskNumber].description" ng-blur="updateDescription()"></textarea>
 			</div>
 			<div class="fileUpload">
 				<div ng-file-drop ng-file-select ng-model="files" class="drop-box" 
 				drag-over-class="dragover" ng-multiple="true" allow-dir="true"
-				accept=".jpg,.png,.pdf">Добавить файл</div>
-				<div ng-no-file-drop>Drag&Drop не поддерживается вашим браузером</div>
+				accept=".jpg,.png,.pdf">{{'app.addFile' | translate}}</div>
+				<div ng-no-file-drop translate>app.dragAndDropErr</div>
 				<ul>
 					<li ng-repeat="file in user.lists[currentListNumber].tasks[currentTaskNumber].attachments">
 					<i class="glyphicon glyphicon-trash" ng-click="removeFile(file, $index, 'sm')"></i>

@@ -8,6 +8,7 @@ var listShema = new mongoose.Schema({
 	tasks:
 	[{
 		taskName: String,
+		assignTo: String,
 		complited: Boolean,
 		attachments:
 		[{

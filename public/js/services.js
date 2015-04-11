@@ -97,12 +97,15 @@ AppService.factory('AppRoute', ['$http',
 
 	}]);
 
-AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope', '$state',
-	function($localStorage, AppRoute, $rootScope, $state) {
+AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope', '$state', '$translate',
+	function($localStorage, AppRoute, $rootScope, $state, $translate) {
 
 		this.checkAccess = function(event, toState, toParams, fromState, fromParams) {
 
 			if ((toState.name=='home' || toState.name=='signup') && $localStorage.user) {
+
+				if ($localStorage.lang) $translate.use($localStorage.lang);
+
 				AppRoute.getUser({ userId: $localStorage.user._id })
 					.success(function(resData) {
 						$localStorage.user = resData;
@@ -116,6 +119,16 @@ AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope',
                 		$state.go('home');
                 	});
 			} else if (fromState.name!='app' && $localStorage.user) {
+
+				if ($localStorage.lang) $translate.use($localStorage.lang);
+
+				$translate(['app.modal.addListMembers', 'app.modal.leaveListButton', 'app.modal.changeListMembers', 'app.modal.deleteButton', 'app.modal.renameList']).then(function (translations) {
+					$rootScope.addListMembersTranslation = translations['app.modal.addListMembers'];
+					$rootScope.leaveListTranslation = translations['app.modal.leaveListButton'];
+					$rootScope.changeListMembersTranslation = translations['app.modal.changeListMembers'];
+					$rootScope.deleteTranslation = translations['app.modal.deleteButton'];
+					$rootScope.renameListTranslation = translations['app.modal.renameList'];
+				});
 
 				if (!$rootScope.pageNotReloaded) io.on('updateUser', function() {
     				$rootScope.accountSync();
@@ -201,6 +214,11 @@ AppService.service('SessionService', ['$localStorage', 'AppRoute', '$rootScope',
 				} else {
 					$rootScope.currentListNumber = 0;
 				}
+			} else if (toState.name=='app' && !$localStorage.user) {
+				event.preventDefault();
+				$state.go('home');
+			} else if ((toState.name=='home' || toState.name=='signup') && !$localStorage.user) {
+				if ($localStorage.lang) $translate.use($localStorage.lang);
 			}
         };
 
